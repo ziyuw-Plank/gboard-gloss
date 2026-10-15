@@ -4,11 +4,17 @@
 
 在谷歌输入法（Gboard）的候选词旁叠加显示目标语言译词，打字时顺便学外语。灵感来自 [青简 Qingjian](https://github.com/qingjian-team/qingjian)。
 
-> **状态：** v0.2.1 已修复「注入成功但无译文」；真机请更新 APK 后强停 Gboard 再测。欢迎反馈 `[gloss]` 日志。
+> **状态：** v0.2.2 已修正错误译文（如「我不理解」→「I」）；请更新 APK 后强停 Gboard 再测。
+
+### v0.2.2
+- **根因：** CJK 最长前缀可退到单字，多字候选（「我不理解」）被显示成「我」→ I; me; my；「离」被古义 mythical beast 抢占
+- 优先整词精确匹配；前缀回退最短长度 2；多字候选绝不回退到单字
+- 支持「不/没」合成、代词剥离、双段切分（两边都命中才拼接）；英文义项只取首义并去掉 to
+- 重建 zh↔en 词典，同形字按义项质量选优（「离」→ leave）
 
 ### v0.2.1
 - **根因：** aapt2 会把 `assets/*.tsv.gz` 解压并去掉 `.gz`，词典实际打不开 → 全部无译文
-- 词典同时兼容 `.tsv.gz` / `.tsv`；CJK 无整词时回退最长前缀（如「这是」→「这」）
+- 词典同时兼容 `.tsv.gz` / `.tsv`
 - 译文在 `SoftKeyView` 绑定时装入缓存，绘制路径只画缓存字符串（省电）
 - 候选条判定结果打 tag，不再每帧爬父节点；高对比度琥珀色/蓝色译词
 
@@ -28,7 +34,7 @@
 - Gboard（对照分析版本 18.4.1）
 
 ## 安装与使用
-1. 从 [Releases](https://github.com/ziyuw-Plank/gboard-gloss/releases) 下载 `GboardGloss-0.2.1.apk` 并安装
+1. 从 [Releases](https://github.com/ziyuw-Plank/gboard-gloss/releases) 下载 `GboardGloss-0.2.2.apk` 并安装
 2. LSPosed 中启用模块，作用域勾选 Gboard（同时勾选模块本身，设置页才能显示状态）
 3. 强行停止 Gboard
 4. 打开 GboardGloss，选择目标语言
@@ -84,16 +90,21 @@ python3 tools/build_dicts.py   # 可选：重新生成词典
 <a id="english"></a>
 ## English
 
+### v0.2.2
+- **Root cause:** CJK longest-prefix could shrink to one character, so multi-char candidates (我不理解) showed 我 → “I; me; my”; 离 was stuck on the archaic “mythical beast” sense
+- Prefer exact whole-candidate match; prefix fallback min length 2; never single-char gloss for multi-char candidates
+- 不/没 composition, pronoun strip, bipartite segment (both sides must hit); English glosses use first sense and drop leading “to”
+- Rebuilt zh↔en dict with sense quality ranking (离 → leave)
+
 ### v0.2.1
 - **Root cause:** aapt2 decompresses `assets/*.tsv.gz` and strips `.gz`, so the dictionary never opened
-- Dictionary loads `.tsv.gz` or `.tsv`; CJK falls back to longest prefix (e.g. 这是 → 这)
+- Dictionary loads `.tsv.gz` or `.tsv`
 - Gloss resolved on SoftKeyView bind and cached; draw path only paints the cached string (battery-friendly)
 - Candidate-strip check cached on a view tag (no parent walk every frame); high-contrast amber/blue gloss
 
-
 GboardGloss shows a translation right above each Gboard suggestion, so you pick up vocabulary in another language while you type. Inspired by [Qingjian 青简](https://github.com/qingjian-team/qingjian).
 
-> **Status:** v0.2.1 fixes “injected but no gloss”. Force-stop Gboard after updating. Please share `[gloss]` logs.
+> **Status:** v0.2.2 fixes wrong glosses (e.g. 我不理解 → I). Force-stop Gboard after updating.
 
 ### Features
 - LSPosed module scoped to Gboard only (`com.google.android.inputmethod.latin`)
@@ -111,7 +122,7 @@ GboardGloss shows a translation right above each Gboard suggestion, so you pick 
 - Gboard (analyzed against 18.4.1)
 
 ### Install & use
-1. Download `GboardGloss-0.2.1.apk` from [Releases](https://github.com/ziyuw-Plank/gboard-gloss/releases) and install it
+1. Download `GboardGloss-0.2.2.apk` from [Releases](https://github.com/ziyuw-Plank/gboard-gloss/releases) and install it
 2. Enable the module in LSPosed and tick Gboard in its scope (tick the module itself too so the settings page can show status)
 3. Force-stop Gboard
 4. Open GboardGloss and choose a target language
