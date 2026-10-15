@@ -1,0 +1,251 @@
+早上	morning	common
+中午	noon|midday	common
+晚上	evening|night	common
+下午	afternoon	common
+上午	morning	common
+星期	week	common
+月亮	moon	common
+太阳	sun	common
+天空	sky	common
+大海	sea|ocean	common
+山	mountain|hill	common
+河	river	common
+花	flower|spend	common
+树	tree	common
+鸟	bird	common
+鱼	fish	common
+鸡蛋	egg	common
+猪肉	pork	common
+牛肉	beef	common
+蔬菜	vegetable	common
+面包	bread	common
+啤酒	beer	common
+茶	tea	common
+厨房	kitchen	common
+卧室	bedroom	common
+客厅	living room|parlor|sitting room	common
+窗户	window	common
+桌子	table|desk	common
+椅子	chair	common
+冰箱	fridge|refrigerator	common
+空调	air condition|air-condition	common
+洗衣机	washing machine|washer	common
+钥匙	key	common
+钱包	wallet|purse	common
+眼镜	glasses|spectacles	common
+雨伞	umbrella	common
+护照	passport	common
+机场	airport	common
+车站	station	common
+酒店	hotel	common
+饭店	restaurant|hotel	common
+餐厅	restaurant|dining	common
+公园	park	common
+图书馆	library	common
+博物馆	museum	common
+警察	police	common
+律师	lawyer	common
+工程师	engineer	common
+司机	driver	common
+护士	nurse	common
+经理	manager	common
+邻居	neighbor|neighbour	common
+孙子	grandson|grandchild	common
+哥哥	brother	common
+姐姐	sister	common
+弟弟	brother	common
+妹妹	sister	common
+丈夫	husband	common
+妻子	wife	common
+儿子	son	common
+女儿	daughter	common
+眼睛	eye	common
+耳朵	ear	common
+头发	hair	common
+肚子	belly|stomach|abdomen	common
+牙齿	tooth|teeth	common
+感谢	thank|grat	common
+道歉	apolog	common
+原谅	forgive|pardon|excuse	common
+拒绝	refuse|reject|decline	common
+接受	accept|receive	common
+考虑	consider|think	common
+建议	suggest|advice|propos|recommend	common
+计划	plan	common
+安排	arrange|plan	common
+改变	change	common
+增加	increase|add|raise	common
+减少	reduce|decrease|lessen	common
+保护	protect	common
+提高	improve|raise|increase|enhance	common
+影响	influence|affect|effect|impact	common
+比较	compare|relative|fairly|rather	common
+相同	same|identical	common
+附近	nearby|vicinity|near	common
+旁边	beside|side|next to	common
+外面	outside	common
+里面	inside	common
+对面	opposite|across	common
+左边	left	common
+右边	right	common
+干净	clean	common
+安静	quiet	common
+热闹	lively|bustling	common
+危险	danger	common
+安全	safe|secur	common
+着急	anxious|worried|hurry|impatient|urgent	common
+难过	sad|grieved|upset|bad	common
+无聊	bored|boring|dull|silly	common
+有趣	interesting|fun|amusing	common
+奇怪	strange|odd|weird	common
+可爱	cute|lovely|adorable	common
+聪明	clever|smart|intelligent	common
+努力	effort|hard|strive|diligent|try	common
+认真	serious|earnest|conscientious	common
+不舒服的	unwell|uncomfortable|not well|not comfortable	neg
+不清楚	unclear|not clear|not sure|don't know	neg
+不习惯	not used to|unaccustomed|not accustomed	neg
+不方便	inconvenient|not convenient|inconvenience	neg
+不满意	dissatisfied|unsatisfied|not satisfied	neg
+不着急	no hurry|not in a hurry|don't worry|not anxious|not worried|not worry	neg
+不认识	not know|don't know|not recognize|unfamiliar	neg
+不需要	no need|not need|unnecessary	neg
+不相信	not believe|disbelieve|don't believe	neg
+不记得	not remember|don't remember|forget	neg
+没看见	not see|didn't see|haven't seen	neg
+没收到	not receive|didn't receive|haven't received	neg
+没吃饭	not eat|haven't eaten|didn't eat|not have a meal	neg
+没去过	never been|haven't been|not been	neg
+没准备	not prepared|unprepared|not ready|haven't prepared|not prepare	neg
+别忘了	don't forget	neg
+别生气	don't be angry|don't get angry|not angry	neg
+别哭	don't cry	neg
+别走	don't go|don't leave	neg
+不能去	can't go|cannot go	neg
+洗碗	wash.*dish|dish	vo
+扫地	sweep	vo
+打扫房间	clean.*room|room	vo
+买菜	grocer|vegetable|food	vo
+做作业	homework	vo
+发短信	text|message|sms	vo
+看新闻	news	vo
+看电视	tv|television	vo
+听广播	radio|broadcast	vo
+学开车	learn.*driv|driv	vo
+开会议	meeting	vo
+订机票	book.*ticket|ticket|flight	vo
+订酒店	book.*hotel|hotel	vo
+交作业	homework|hand in|submit	vo
+修电脑	repair.*computer|fix.*computer|computer	vo
+吃早饭	breakfast	vo
+喝咖啡	coffee	vo
+踢足球	soccer|football	vo
+打篮球	basketball	vo
+游泳	swim	vo
+爬山	climb|hik|mountain	vo
+放假	holiday|vacation|day off|break	vo
+搬家	move	vo
+结婚	marry|marri|wedding	vo
+生孩子	birth|baby|child	vo
+你去哪	where.*go	sentence
+你去哪里	where.*go	sentence
+你叫什么	name|what.*call	sentence
+我是学生	student	sentence
+我不会	can't|cannot|don't know|won't|not	sentence
+我不能	can't|cannot|unable	sentence
+我很忙	busy	sentence
+我很累	tired	sentence
+我很想你	miss you	sentence
+我们走吧	let's go|go	sentence
+快点	hurry|quick|faster	sentence
+慢慢来	take your time|slowly|slow	sentence
+小心点	careful	sentence
+放心	relax|rest assured|don't worry|at ease|relieved	sentence
+别客气了	welcome|polite|don't mention	sentence
+不要紧	doesn't matter|unimportant|not serious|it's nothing|no problem	sentence
+对了	by the way|right|correct	sentence
+是不是	is it|isn't it|whether|right	sentence
+有没有	is there|have|any	sentence
+要不要	want|do you want|or not	sentence
+怎么可能	how.*possib|impossible|no way	sentence
+真不错	not bad|great|good|nice	sentence
+太可惜了	pity|shame|too bad	sentence
+好开心	happy|glad	sentence
+好难过	sad|upset	sentence
+好累啊	tired	sentence
+今天星期几	day|week	sentence
+现在几点	what time|time	sentence
+我饿死了	hungry|starv	sentence
+吓死我了	scare|scared|frighten	sentence
+不会吧	no way|really|can't be	sentence
+一举一动	every move|every action|movement	idiom
+一言为定	deal|agreed|settled|promise	idiom
+九牛一毛	drop in the ocean|drop in the bucket|tiny|trifle|insignificant	idiom
+画龙点睛	finishing touch|crucial|touch|finishing	idiom
+破釜沉舟	no retreat|burn.*bridge|burn.*boat|cut off|desperate	idiom
+叶公好龙	pretend|professed|fake|hypocrit|ostensible	idiom
+狐假虎威	borrow|power|bully|tiger	idiom
+杞人忧天	unnecessary|groundless|needless|worry	idiom
+卧虎藏龙	hidden|crouching tiger|talent	idiom
+雪中送炭	help|need|timely	idiom
+锦上添花	icing|add.*flower|embellish|better	idiom
+百闻不如一见	seeing is believing|see	idiom
+一针见血	hit the nail|to the point|incisive|pointed	idiom
+滥竽充数	make up the number|incompetent|pass oneself off|fill|token member	idiom
+脚踏实地	down-to-earth|down to earth|practical|feet on the ground|earnest|steady and serious	idiom
+物理学	physics	tech
+热力学	thermodynamics	tech
+电磁学	electromagnetism	tech
+光学	optics	tech
+天文学	astronomy	tech
+地质学	geology	tech
+心理学	psychology	tech
+经济学	economics	tech
+哲学	philosophy	tech
+统计学	statistics	tech
+线性代数	linear algebra	tech
+傅里叶变换	fourier	tech
+微分方程	differential equation	tech
+标准差	standard deviation	tech
+平均值	average|mean	tech
+正态分布	normal distribution	tech
+熵	entropy	tech
+动量守恒	conservation of momentum	tech
+能量守恒	conservation of energy	tech
+万有引力	gravit	tech
+摩擦力	friction	tech
+电磁波	electromagnetic wave	tech
+红外线	infrared	tech
+紫外线	ultraviolet	tech
+放射性	radioactiv	tech
+同位素	isotope	tech
+催化剂	catalyst	tech
+氧化	oxidiz|oxidat	tech
+氢气	hydrogen	tech
+氧气	oxygen	tech
+二氧化碳	carbon dioxide	tech
+染色体	chromosome	tech
+抗生素	antibiotic	tech
+免疫系统	immune system	tech
+神经元	neuron	tech
+编译	compil	tech
+调试	debug|test|adjust	tech
+接口	interface|port	tech
+框架	framework|frame	tech
+线程	thread	tech
+进程	process	tech
+缓存	cache	tech
+加密	encrypt	tech
+数据结构	data structure	tech
+开源软件	open source|open-source	tech
+人脸识别	face recognition|facial recognition	tech
+语音识别	speech recognition|voice recognition	tech
+图像处理	image processing	tech
+计算机视觉	computer vision	tech
+强化学习	reinforcement learning	tech
+大模型	large model|large language model|llm	tech
+显示器	monitor|display	tech
+路由器	router	tech
+交换机	switch	tech
+防火墙	firewall	tech
+病毒软件	virus|antivirus|malware	tech

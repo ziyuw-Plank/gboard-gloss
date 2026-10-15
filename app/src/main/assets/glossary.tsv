@@ -52,3 +52,339 @@
 操作系统	operating system
 编译器	compiler
 开源	open source
+# Everyday chat phrases (natural English rather than word-by-word)
+你好吗	how are you
+你好啊	hi there
+我很好	I'm fine
+我也是	me too
+我也一样	same here
+好的	OK
+好吧	alright
+好啊	sure
+好呀	sure
+行吧	fine
+可以吗	is that OK?
+可以的	sure
+对啊	right
+对呀	right
+是啊	yes
+是吗	really?
+真的吗	really?
+不是吧	no way
+在吗	are you there?
+在不在	are you there?
+你在哪	where are you?
+你在哪里	where are you?
+你在哪儿	where are you?
+你在干嘛	what are you doing?
+你在干什么	what are you doing?
+你在做什么	what are you doing?
+干嘛	what for?
+干什么	what for?
+怎么了	what's wrong?
+怎么回事	what happened?
+怎么办	what to do?
+为什么不	why not
+你说呢	what do you think?
+你觉得呢	what do you think?
+你说得对	you're right
+你说的对	you're right
+有道理	makes sense
+我想你	I miss you
+我想你了	I miss you
+我爱你	I love you
+我喜欢你	I like you
+我饿了	I'm hungry
+我累了	I'm tired
+我困了	I'm sleepy
+我到了	I'm here
+我到家了	I'm home
+我回来了	I'm back
+我走了	I'm leaving
+我要走了	I have to go
+我先走了	I'm heading off
+我知道了	got it
+我明白了	I see
+我懂了	I get it
+知道了	got it
+明白了	got it
+收到	received
+没关系的	it's fine
+没事的	it's fine
+没事儿	it's nothing
+没空	not free
+没问题	no problem
+没办法	no choice
+别担心	don't worry
+别着急	take your time
+不太懂	don't quite get it
+不想	don't want
+不用了	no need
+不用谢	you're welcome
+不客气	you're welcome
+多少钱	how much?
+几点了	what time is it?
+吃了吗	have you eaten?
+你吃了吗	have you eaten?
+吃饭了吗	have you eaten?
+已经吃了	already ate
+还没有	not yet
+还没	not yet
+马上到	almost there
+马上来	coming
+等我一下	wait for me
+等一下	wait a moment
+等一等	wait a moment
+稍等	one moment
+请稍等	one moment, please
+辛苦了	thanks for your hard work
+麻烦你了	sorry to trouble you
+不好意思	sorry
+很高兴认识你	nice to meet you
+好久不见	long time no see
+晚上见	see you tonight
+明天见	see you tomorrow
+回头见	see you later
+一会儿见	see you soon
+下次见	see you next time
+下次再说	maybe next time
+早点睡	sleep early
+早点休息	get some rest
+注意安全	stay safe
+路上小心	take care on the way
+生日快乐	happy birthday
+新年快乐	happy new year
+节日快乐	happy holidays
+周末愉快	have a nice weekend
+祝你好运	good luck
+恭喜	congratulations
+哈哈	haha
+哈哈哈	hahaha
+呵呵	heh
+嘿嘿	hehe
+晚安	good night
+早安	good morning
+太贵了	too expensive
+太好了	great!
+太棒了	awesome!
+真棒	awesome
+牛逼	awesome
+厉害了	impressive
+加油	keep going!
+随便	whatever
+算了	forget it
+我不知道	I don't know
+我不管	I don't care
+无所谓	doesn't matter
+看情况	it depends
+没意思	boring
+有意思	interesting
+真的假的	seriously?
+什么意思	what do you mean?
+在路上	on the way
+我在路上	I'm on the way
+到了吗	are you there yet?
+睡了吗	are you asleep?
+起床了吗	are you up?
+怎么样了	how's it going?
+最近怎么样	how have you been?
+等等	wait; etc.
+多少	how many
+一起	together
+当然	of course
+发现	discover
+态度	attitude
+星系	galaxy
+讲故事	tell a story
+写作业	do homework
+点外卖	order takeout
+看不懂	can't understand
+听不懂	can't understand
+你们	you (plural)
+们	(plural marker)
+#
+# Common terms where the dictionary's first sense is misleading
+資料庫	database
+数据库	database
+軟體	software
+硬體	hardware
+程式	program
+網路	network
+十全十美	perfect
+一心一意	wholeheartedly
+半信半疑	half-doubting
+理所当然	naturally
+迫不及待	can't wait
+熟能生巧	practice makes perfect
+一帆风顺	smooth sailing
+对牛弹琴	preach to deaf ears
+刻舟求剑	stubbornly outdated
+千方百计	by every means
+#
+# A-not-A questions and chat fixed expressions
+是不是	isn't it?
+有没有	is there any?
+要不要	do you want?
+好不好	OK?
+对不对	right?
+行不行	OK?
+能不能	can you?
+会不会	can you? / will it?
+可不可以	may I?
+去不去	going or not?
+来不来	coming or not?
+不会吧	no way
+怎么可能	how is that possible?
+真的假的	seriously?
+你叫什么	what's your name?
+你叫什么名字	what's your name?
+我们走吧	let's go
+走吧	let's go
+吓死我了	you scared me
+放心	don't worry
+放心吧	don't worry
+一言为定	it's a deal
+#
+# Modern everyday senses (dictionary's first sense is dated)
+酒店	hotel
+饭店	restaurant; hotel
+宾馆	hotel
+打车	take a taxi
+外卖	takeout
+快递	express delivery
+网购	online shopping
+直播	livestream
+主播	streamer
+粉丝	fans
+点赞	like (a post)
+朋友圈	WeChat Moments
+群聊	group chat
+表情包	stickers
+截屏	screenshot
+充电宝	power bank
+流量	mobile data; traffic
+红包	red envelope
+扫码	scan the code
+支付宝	Alipay
+淘宝	Taobao
+视频通话	video call
+语音	voice message; speech
+#
+# Computing / AI
+编译	compile
+编译器	compiler
+进程	process
+线程	thread
+内核	kernel
+驱动	driver
+调试	debug
+部署	deploy
+接口	interface; API
+框架	framework
+插件	plugin
+脚本	script
+变量	variable
+参数	parameter
+函数	function
+对象	object
+类	class
+继承	inheritance
+递归	recursion
+迭代	iteration
+数组	array
+链表	linked list
+哈希表	hash table
+栈	stack
+队列	queue
+指针	pointer
+字符串	string
+整数	integer
+浮点数	floating-point number
+布尔值	boolean
+异常	exception
+日志	log
+缓存	cache
+内存泄漏	memory leak
+并发	concurrency
+异步	asynchronous
+分布式	distributed
+微服务	microservices
+容器	container
+虚拟机	virtual machine
+云服务	cloud service
+前端	front end
+后端	back end
+全栈	full stack
+数据结构	data structure
+时间复杂度	time complexity
+开源软件	open-source software
+版本控制	version control
+代码仓库	code repository
+提交	commit; submit
+分支	branch
+合并	merge
+人脸识别	face recognition
+语音识别	speech recognition
+图像识别	image recognition
+图像处理	image processing
+计算机视觉	computer vision
+强化学习	reinforcement learning
+监督学习	supervised learning
+无监督学习	unsupervised learning
+迁移学习	transfer learning
+大模型	large model (LLM)
+预训练	pre-training
+微调	fine-tuning
+推理	inference; reasoning
+训练集	training set
+测试集	test set
+损失函数	loss function
+梯度下降	gradient descent
+反向传播	backpropagation
+卷积神经网络	convolutional neural network
+注意力机制	attention mechanism
+提示词	prompt
+智能体	agent
+#
+# Science / math
+傅里叶变换	Fourier transform
+拉普拉斯变换	Laplace transform
+线性代数	linear algebra
+微分方程	differential equation
+偏微分方程	partial differential equation
+特征值	eigenvalue
+特征向量	eigenvector
+标准差	standard deviation
+方差	variance
+期望值	expected value
+正态分布	normal distribution
+熵	entropy
+焓	enthalpy
+热力学	thermodynamics
+统计力学	statistical mechanics
+电动力学	electrodynamics
+凝聚态	condensed matter
+粒子物理	particle physics
+标准模型	Standard Model
+希格斯玻色子	Higgs boson
+暗物质	dark matter
+暗能量	dark energy
+宇宙学	cosmology
+天体物理	astrophysics
+光谱	spectrum
+折射	refraction
+衍射	diffraction
+干涉	interference
+偏振	polarization
+共振	resonance
+振幅	amplitude
+相位	phase
+横波	transverse wave
+纵波	longitudinal wave
+磁通量	magnetic flux
+电荷	electric charge
+电势	electric potential
+电容	capacitance
+电感	inductance
+万有引力	universal gravitation
+摩擦力	friction

@@ -1,0 +1,591 @@
+# phrase	acceptable keywords (any substring match, case-insensitive)	category
+你好	hello|hi	common
+谢谢	thank	common
+不客气	welcome|mention it|polite	common
+对不起	sorry	common
+没关系	matter|okay|ok|alright|worry	common
+再见	bye	common
+早上好	good morning	common
+晚安	good night	common
+欢迎	welcome	common
+朋友	friend	common
+老师	teacher	common
+学生	student	common
+学校	school	common
+医院	hospital	common
+医生	doctor	common
+工作	work|job	common
+公司	company|firm	common
+时间	time	common
+今天	today	common
+明天	tomorrow	common
+昨天	yesterday	common
+现在	now|present	common
+以后	after|later|future	common
+以前	before|previously|ago	common
+已经	already	common
+可能	possib|may|maybe|might	common
+应该	should|ought	common
+需要	need	common
+喜欢	like|fond	common
+知道	know	common
+觉得	think|feel	common
+认为	believe|think|consider	common
+希望	hope|wish	common
+开始	begin|start	common
+结束	end|finish|conclu	common
+问题	problem|question|issue	common
+办法	method|way|means	common
+方法	method|way	common
+事情	affair|matter|thing	common
+东西	thing|stuff	common
+地方	place	common
+电脑	computer	common
+手机	phone	common
+电话	phone|telephone	common
+网络	network|internet	common
+电影	movie|film	common
+音乐	music	common
+游戏	game	common
+吃饭	eat|meal	common
+睡觉	sleep|bed	common
+喝水	drink water|water	common
+回家	home	common
+上班	work	common
+下班	work|off	common
+休息	rest	common
+旅游	travel|tour|trip	common
+天气	weather	common
+下雨	rain	common
+中国	china	common
+美国	america|us|usa|united states	common
+日本	japan	common
+北京	beijing	common
+上海	shanghai	common
+中文	chinese	common
+英语	english	common
+汉字	chinese character|character	common
+语言	language	common
+翻译	translat	common
+意思	meaning|idea|sense	common
+为什么	why	common
+怎么	how	common
+怎么样	how	common
+什么	what	common
+哪里	where	common
+多少	how many|how much	common
+所以	so|therefore	common
+因为	because	common
+但是	but|however	common
+如果	if	common
+虽然	although|though	common
+然后	then|after	common
+或者	or	common
+而且	and|moreover|also|furthermore	common
+一起	together	common
+一定	certain|sure|must|definite	common
+非常	very|extremely|unusual	common
+特别	special|especial|particular	common
+真的	real|true|really	common
+当然	of course|naturally|certain	common
+其实	actually|in fact	common
+马上	immediately|at once|right away	common
+突然	sudden	common
+经常	often|frequent	common
+一般	general|ordinary|usual|common	common
+简单	simple	common
+容易	easy	common
+困难	difficult|difficulty|hard	common
+重要	important	common
+漂亮	beautiful|pretty	common
+高兴	happy|glad	common
+快乐	happy|joy	common
+生气	angry	common
+担心	worry|worr	common
+害怕	afraid|fear	common
+舒服	comfortable	common
+累死了	tired|exhausted	common
+饿了	hungry	common
+厉害	fierce|formidable|awesome|amazing|terrible|sharp|severe	common
+好吃	tasty|delicious	common
+好看	good-looking|nice|pretty|good looking	common
+便宜	cheap	common
+贵	expensive	common
+钱	money	common
+买东西	shop|buy	common
+超市	supermarket	common
+银行	bank	common
+商店	shop|store	common
+飞机	airplane|plane|aircraft	common
+火车	train	common
+地铁	subway|metro|underground	common
+出租车	taxi	common
+自行车	bicycle|bike	common
+汽车	car|automobile|vehicle	common
+房子	house	common
+家人	family	common
+父母	parent|father and mother	common
+妈妈	mom|mother|mum	common
+爸爸	dad|father	common
+孩子	child|kid	common
+女朋友	girlfriend	common
+男朋友	boyfriend	common
+老婆	wife	common
+老公	husband	common
+生日	birthday	common
+礼物	gift|present	common
+周末	weekend	common
+假期	holiday|vacation	common
+新年	new year	common
+春节	spring festival|new year	common
+早饭	breakfast	common
+午饭	lunch	common
+晚饭	dinner|supper|evening meal	common
+咖啡	coffee	common
+牛奶	milk	common
+水果	fruit	common
+苹果	apple	common
+米饭	rice	common
+面条	noodle	common
+衣服	cloth	common
+鞋子	shoe	common
+身体	body|health	common
+健康	health	common
+感冒	cold|flu	common
+发烧	fever|high temperature	common
+头疼	headache	common
+运动	sport|exercise|movement|motion	common
+跑步	run|jog	common
+学习	study|learn	common
+考试	exam|test	common
+作业	homework|assignment|work	common
+大学	university|college	common
+专业	major|specialty|profession|discipline|field	common
+研究	research|study	common
+历史	history	common
+文化	culture	common
+经济	econom	common
+政治	politic	common
+社会	society|social	common
+国家	country|nation|state	common
+世界	world	common
+城市	city	common
+环境	environment	common
+发展	develop	common
+技术	technology|technique|skill	common
+科学	science	common
+数据	data	common
+信息	information|news|message	common
+软件	software	common
+硬件	hardware	common
+程序	program|procedure	common
+密码	password|code|cipher	common
+账号	account	common
+下载	download	common
+上传	upload	common
+文件	file|document	common
+图片	picture|image|photo	common
+视频	video	common
+微信	wechat	common
+发消息	message|send	common
+聊天	chat	common
+开会	meeting|meet	common
+会议	meeting|conference	common
+项目	project|item	common
+老板	boss	common
+同事	colleague|coworker	common
+客户	client|customer	common
+工资	salary|wage|pay	common
+加班	overtime	common
+请假	leave	common
+迟到	late	common
+准备	prepare|ready|preparation	common
+完成	complete|finish|accomplish	common
+决定	decide|decision	common
+选择	choose|select|choice|option	common
+同意	agree	common
+反对	oppose|object|against	common
+帮助	help|assist	common
+帮忙	help	common
+支持	support|in favor	common
+解决	solve|resolve|settle	common
+检查	check|inspect|exam	common
+注意	attention|notice|careful|heed|take note	common
+小心	careful|caution	common
+记得	remember	common
+忘记	forget	common
+相信	believe|trust	common
+告诉	tell	common
+介绍	introduc|present	common
+解释	explain|explanation|interpret	common
+讨论	discuss	common
+参加	participate|join|attend|take part	common
+离开	leave|depart	common
+到达	arrive|reach	common
+出发	set off|depart|start	common
+联系	contact|connect|touch|link|relat	common
+见面	meet	common
+等一下	wait|moment|minute|second|later	phrase
+等等	wait|etc	phrase
+没问题	no problem	phrase
+不知道	not know|don't know|do not know	neg
+不明白	not understand|don't understand|not clear	neg
+不理解	not understand|not comprehend	neg
+不喜欢	not like|dislike|don't like	neg
+不要	don't|do not|not want	neg
+不用	need not|no need|don't need|not necessary|not need	neg
+不行	not ok|won't do|no way|not allowed|not work|no good|not good|unacceptable|not possible	neg
+不错	not bad|good|correct	neg
+不好	not good|bad|no good	neg
+不能	cannot|can't|can not|unable|must not|not able	neg
+不会	not|unlikely|won't|improbable	neg
+不想	not want|don't want|unwilling|not wish|not think	neg
+不舒服	unwell|not comfortable|uncomfortable|not feel well|not well	neg
+不重要	not important|unimportant	neg
+不一样	different|not the same	neg
+不一定	not necessarily|not sure|uncertain	neg
+不可能	impossible|not possible	neg
+不够	not enough|insufficient	neg
+不对	wrong|incorrect|not right|not correct	neg
+不同	different|distinct	neg
+没有	not have|no|without|haven't|none	neg
+没空	busy|no time|not free	neg
+没事	nothing|all right|it's ok|okay|fine|no matter|not important|doesn't matter	neg
+没办法	no way|nothing.*can|no choice|can't help|helpless|cannot	neg
+没时间	no time	neg
+没意思	boring|uninteresting|no meaning|meaningless|dull|not interesting	neg
+没听懂	not understand|didn't understand|did not understand	neg
+没想到	unexpected|didn't expect|never thought|didn't think|not expect	neg
+不太好	not very good|not good|not so good	neg
+不太懂	not understand|not quite understand|don't quite	neg
+别担心	don't worry|not worry	neg
+别客气	welcome|polite|don't mention	neg
+我不知道	not know|don't know	sentence
+我爱你	love you	sentence
+我想你	miss you	sentence
+我喜欢你	like you	sentence
+我不喜欢	not like|dislike	sentence
+你在哪	where	sentence
+你在干嘛	what.*doing|doing	sentence
+你吃了吗	eat|eaten	sentence
+吃了吗	eat|eaten	sentence
+你好吗	how are you	sentence
+我很好	fine|good|well	sentence
+我也是	me too|so am i|also|too	sentence
+好的	ok|okay|fine|alright|all right|good|sure	sentence
+好吧	ok|okay|fine|alright|all right	sentence
+是的	yes|right	sentence
+对啊	right|yes|true	sentence
+真的吗	really	sentence
+太好了	great|wonderful|excellent|very good	sentence
+太贵了	expensive	sentence
+我饿了	hungry	sentence
+我累了	tired	sentence
+我知道了	know|got it|see|understand	sentence
+我明白了	understand|see|got it	sentence
+我回来了	back|return	sentence
+我到了	arrive|here	sentence
+我要走了	go|leave	sentence
+你说呢	you say|what do you think|think	sentence
+怎么了	what's wrong|what happened|matter|what's up	sentence
+怎么办	what to do|what.*do	sentence
+多少钱	how much	sentence
+几点了	what time|time	sentence
+在吗	there|are you	sentence
+辛苦了	hard work|thank|tired|trouble	sentence
+加油	come on|go|add oil|refuel|cheer|fuel	sentence
+晚上见	see you|evening|tonight	sentence
+明天见	see you tomorrow|tomorrow	sentence
+一会儿见	see you|later	sentence
+生日快乐	happy birthday	sentence
+新年快乐	happy new year	sentence
+祝你好运	good luck	sentence
+随便	casual|as you wish|whatever|random|any|as one wishes	sentence
+算了	forget it|let it go|never mind|drop it|let it be|let it pass	sentence
+哈哈	haha|laugh	sentence
+打电话	phone|call	vo
+发邮件	email|e-mail|mail	vo
+看电影	movie|film	vo
+看书	read	vo
+听音乐	music	vo
+写作业	homework	vo
+做饭	cook|prepare a meal	vo
+洗澡	bath|shower	vo
+洗手	wash.*hand|wash	vo
+刷牙	brush.*teeth|teeth	vo
+起床	get up|rise|get out of bed	vo
+开车	drive	vo
+坐车	ride|take.*bus|car|vehicle	vo
+买票	ticket|buy	vo
+付钱	pay	vo
+花钱	spend|money	vo
+赚钱	earn|make money|money	vo
+上网	internet|online|surf	vo
+玩游戏	play.*game|game	vo
+拍照	photo|picture	vo
+唱歌	sing	vo
+跳舞	dance	vo
+画画	paint|draw	vo
+看医生	doctor|see	vo
+吃药	medicine|medication|drug|pill	vo
+喝酒	drink|alcohol|wine	vo
+抽烟	smoke	vo
+开门	open.*door|door|open	vo
+关门	close.*door|shut|close	vo
+开灯	light|lamp	vo
+关灯	light|lamp	vo
+关机	shut down|power off|turn off|switch off	vo
+开机	start|boot|turn on|power on|switch on	vo
+充电	charg	vo
+换衣服	change.*cloth|cloth|dress	vo
+说话	speak|talk|say	vo
+讲故事	story|tell	vo
+写代码	code|program	vo
+学中文	chinese|study|learn	vo
+学英语	english|study|learn	vo
+找工作	job|work	vo
+找不到	not find|can't find|cannot find|unable to find	vo
+看不懂	not understand|can't understand|cannot understand|unable to understand	vo
+听不懂	not understand|can't understand|cannot understand	vo
+做不到	can't|cannot|unable|impossible	vo
+来不及	too late|not enough time|no time|there's not enough time	vo
+走路	walk	vo
+排队	queue|line up|stand in line	vo
+请客	treat|invite|host|dinner party	vo
+点外卖	takeout|takeaway|delivery|order	vo
+一石二鸟	two birds	idiom
+一举两得	two|both|kill two	idiom
+马马虎虎	so-so|careless|so so|fair|not bad	idiom
+乱七八糟	mess|chaos|disorder|confusion|topsy	idiom
+不可思议	inconceivable|unimaginable|unbelievable|incredible	idiom
+自言自语	talk to oneself|soliloqu|mutter|oneself	idiom
+一模一样	exactly|identical|same	idiom
+半途而废	give up|halfway|abandon|quit	idiom
+画蛇添足	superfluous|unnecessary|ruin|gild|overdo	idiom
+守株待兔	wait|chance|windfall|luck	idiom
+对牛弹琴	cow|deaf|cast pearls|wrong audience|play the lute	idiom
+入乡随俗	romans|custom|when in rome	idiom
+一见钟情	love at first sight|first sight|love at first	idiom
+刻舟求剑	method|futile|stubborn|boat	idiom
+井底之蛙	frog|well|limited|narrow	idiom
+亡羊补牢	mend|better late|too late|lock the stable|belated	idiom
+塞翁失马	blessing in disguise|blessing|misfortune|fortune	idiom
+熟能生巧	practice makes perfect|practice	idiom
+一路平安	safe|bon voyage|journey	idiom
+一帆风顺	smooth|plain sailing|sailing	idiom
+万事如意	well|wish|best|go as|hope	idiom
+心想事成	dream|come true|wish	idiom
+自相矛盾	contradict|inconsist	idiom
+迫不及待	impatient|eager|can't wait|cannot wait|hurry	idiom
+莫名其妙	baffl|inexplicab|puzzl|unaccountabl|without reason|baffle|bizarre|strange	idiom
+理所当然	natural|obvious|course|granted|matter of course	idiom
+津津有味	relish|gusto|zest|delicious|interest	idiom
+一丝不苟	meticulous|scrupulous|careful|conscientious|not one thread loose	idiom
+全力以赴	all-out|go all out|all one|utmost|all|full	idiom
+大吃一惊	surprise|shock|astonish|startl|astound	idiom
+无可奈何	helpless|no way|no alternative|resign|no choice	idiom
+各种各样	various|all kinds|all sorts|every kind|diverse|variety	idiom
+千方百计	every way|every means|every possible|all possible|by all means|every	idiom
+不知不觉	unconscious|unaware|unknowing|without noticing|imperceptib|unwitting	idiom
+小题大做	fuss|mountain|molehill|big deal|overreact	idiom
+人山人海	crowd|sea of people|huge crowds|crowded	idiom
+五颜六色	colorful|colourful|multi-color|multicolor|all colors|varie	idiom
+七上八下	anxious|perturbed|uneasy|agitated|unsettled|disorder|sixes and sevens	idiom
+一心一意	heart and soul|wholehearted|single-mind|undivided	idiom
+半信半疑	doubt|half-believ|skeptic|dubious	idiom
+十全十美	perfect|flawless	idiom
+三心二意	half-hearted|half hearted|undecided|wavering|of two minds|irresolute|shilly|two minds	idiom
+四面八方	all directions|every direction|all sides|everywhere|every side	idiom
+目瞪口呆	dumbstruck|stunned|stupefied|gap|astonish|dumbfound|stunn	idiom
+胡说八道	nonsense|talk rubbish|rubbish|gibberish|drivel	idiom
+一干二净	clean|thorough|completely|totally|clear	idiom
+动量	momentum	tech
+横动量	transverse momentum	tech
+角动量	angular momentum	tech
+能量	energy	tech
+质量	mass|quality	tech
+速度	speed|velocity	tech
+加速度	acceleration	tech
+电子	electron|electronic	tech
+质子	proton	tech
+中子	neutron	tech
+原子	atom	tech
+分子	molecule|molecular	tech
+光子	photon	tech
+量子	quantum	tech
+引力	gravit	tech
+磁场	magnetic field	tech
+电场	electric field	tech
+电流	current	tech
+电压	voltage	tech
+电阻	resist	tech
+频率	frequen	tech
+波长	wavelength	tech
+温度	temperature	tech
+压力	pressure|stress	tech
+密度	density	tech
+化学	chemi	tech
+物理	physic	tech
+数学	math	tech
+生物	biolog|organism|living	tech
+细胞	cell	tech
+基因	gene	tech
+蛋白质	protein	tech
+病毒	virus	tech
+疫苗	vaccine	tech
+算法	algorithm	tech
+函数	function	tech
+变量	variable	tech
+矩阵	matrix	tech
+向量	vector	tech
+微积分	calculus	tech
+导数	derivative	tech
+积分	integral|integra|point|credit	tech
+概率	probabilit	tech
+统计	statistic	tech
+方程	equation	tech
+数据库	database	tech
+服务器	server	tech
+人工智能	artificial intelligence|ai	tech
+机器学习	machine learning	tech
+深度学习	deep learning	tech
+神经网络	neural network	tech
+云计算	cloud computing	tech
+区块链	blockchain	tech
+操作系统	operating system	tech
+编程	program|cod	tech
+源代码	source code	tech
+浏览器	browser	tech
+搜索引擎	search engine	tech
+芯片	chip	tech
+处理器	processor	tech
+内存	memory|ram|internal storage	tech
+硬盘	hard disk|hard drive|disk	tech
+显卡	graphics card|video card|graphics	tech
+键盘	keyboard	tech
+鼠标	mouse	tech
+屏幕	screen	tech
+电池	battery	tech
+输入法	input method|ime	tech
+蓝牙	bluetooth	tech
+无线网络	wireless network|wireless	tech
+半导体	semiconductor	tech
+超导体	superconductor	tech
+太阳能	solar	tech
+核能	nuclear	tech
+光合作用	photosynthesis	tech
+进化论	evolution	tech
+相对论	relativity	tech
+量子力学	quantum mechanics	tech
+黑洞	black hole	tech
+宇宙	universe|cosmos	tech
+星系	galaxy	tech
+行星	planet	tech
+卫星	satellite	tech
+气候变化	climate change	tech
+全球变暖	global warming	tech
+可再生能源	renewable energy|renewable	tech
+电动汽车	electric car|electric vehicle|electric-powered|electric car	tech
+自动驾驶	autonomous|self-driving|autopilot|driverless|automatic driv	tech
+虚拟现实	virtual reality	tech
+大数据	big data	tech
+物联网	internet of things|iot	tech
+用户界面	user interface	tech
+截图	screenshot	tech
+二维码	qr code|qr|two-dimensional|barcode	tech
+验证码	verification code|captcha|code	tech
+我们	we|us	common
+他们	they|them	common
+大家	everyone|everybody|all	common
+自己	oneself|self|own	common
+别人	other|others	common
+这个	this	common
+那个	that	common
+这里	here	common
+那里	there	common
+这样	this way|like this|so|such	common
+一点	a bit|a little|bit|little	common
+一些	some|few	common
+所有	all	common
+每天	every day|daily	common
+有时候	sometimes	common
+刚才	just now|a moment ago	common
+最近	recent|lately	common
+以为	think|thought|believe|assume	common
+看见	see|saw	common
+听说	heard|hear	common
+发现	discover|find|found	common
+得到	get|obtain|receive	common
+成功	success	common
+失败	fail|defeat	common
+机会	chance|opportunit	common
+经验	experience	common
+能力	ability|capabilit|capacit	common
+态度	attitude	common
+关系	relation|connection|relationship	common
+感觉	feel|sense|feeling	common
+心情	mood	common
+爱情	love|romance	common
+友谊	friendship|companionship	common
+幸福	happiness|happy|bliss|well-being	common
+梦想	dream	common
+未来	future	common
+过去	past|go over|pass	common
+已经吃了	already eat|already eaten|have eaten|ate	sentence
+还没有	not yet|still not|haven't|have not	sentence
+今天很忙	busy	sentence
+天气很好	weather.*good|good weather|nice	sentence
+下雨了	rain	sentence
+我在家	home	sentence
+我在路上	on the way|road	sentence
+马上到	arriv|soon|right away|immediately|almost there	sentence
+等我一下	wait	sentence
+请稍等	wait|moment|minute	sentence
+没关系的	matter|okay|ok|alright|worry|it's fine	sentence
+你说得对	right|correct	sentence
+有道理	reasonable|make sense|makes sense|sensible|reason	sentence
+我同意	agree	sentence
+我觉得	think|feel	sentence
+你觉得呢	what do you think|think	sentence
+麻烦你了	trouble|thank|bother	sentence
+不好意思	sorry|excuse me|embarrass	sentence
+很高兴认识你	nice to meet you|pleased to meet you|meet you	sentence
+欢迎光临	welcome	sentence
+一路顺风	bon voyage|safe journey|journey|trip	sentence
+注意安全	safe|careful|safety	sentence
+早点睡	sleep|bed|early	sentence
+好久不见	long time no see|long time	sentence
+下次再说	next time|later	sentence
+谢谢你	thank	sentence
+非常感谢	thank|grateful	sentence
+没什么	nothing|it's nothing|never mind|no matter|doesn't matter	sentence
+为什么不	why not	sentence
+什么时候	when	sentence
+在哪里	where	sentence
+怎么走	how.*get|way|how to go|how.*walk	sentence
+可以吗	may|can|okay|ok|alright|is it	sentence
+可以	can|may|okay|ok|possible|able	common
+行	ok|okay|all right|alright|fine|walk|go|travel|capable|row|line	common
+好	good|well|fine	common
+是	yes|is|be|right	common
+不	no|not	common
+爱	love	common
+吃	eat	common
+喝	drink	common
+走	walk|go|leave	common
+来	come	common
+去	go	common
+看	look|see|watch|read	common
+说	say|speak|talk	common
+想	think|want|miss|wish	common
+大	big|large|great	common
+小	small|little	common
+多	many|much|more	common
+少	few|little|less	common
+人	person|people|human	common
+水	water	common
+火	fire	common
+书	book	common
+车	car|vehicle	common
+猫	cat	common
+狗	dog	common
