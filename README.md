@@ -4,7 +4,13 @@
 
 在谷歌输入法（Gboard）的候选词旁叠加显示目标语言译词，打字时顺便学外语。灵感来自 [青简 Qingjian](https://github.com/qingjian-team/qingjian)。
 
-> **状态：** v0.2 已能编译，但**尚未在真机上验证注入效果**。欢迎反馈测试结果（附 `[gloss]` 日志）。
+> **状态：** v0.2.1 已修复「注入成功但无译文」；真机请更新 APK 后强停 Gboard 再测。欢迎反馈 `[gloss]` 日志。
+
+### v0.2.1
+- **根因：** aapt2 会把 `assets/*.tsv.gz` 解压并去掉 `.gz`，词典实际打不开 → 全部无译文
+- 词典同时兼容 `.tsv.gz` / `.tsv`；CJK 无整词时回退最长前缀（如「这是」→「这」）
+- 译文在 `SoftKeyView` 绑定时装入缓存，绘制路径只画缓存字符串（省电）
+- 候选条判定结果打 tag，不再每帧爬父节点；高对比度琥珀色/蓝色译词
 
 ## 功能
 - 仅作用于 Gboard（`com.google.android.inputmethod.latin`）的 LSPosed 模块
@@ -22,7 +28,7 @@
 - Gboard（对照分析版本 18.4.1）
 
 ## 安装与使用
-1. 从 [Releases](https://github.com/ziyuw-Plank/gboard-gloss/releases) 下载 `GboardGloss-0.2.apk` 并安装
+1. 从 [Releases](https://github.com/ziyuw-Plank/gboard-gloss/releases) 下载 `GboardGloss-0.2.1.apk` 并安装
 2. LSPosed 中启用模块，作用域勾选 Gboard（同时勾选模块本身，设置页才能显示状态）
 3. 强行停止 Gboard
 4. 打开 GboardGloss，选择目标语言
@@ -78,9 +84,16 @@ python3 tools/build_dicts.py   # 可选：重新生成词典
 <a id="english"></a>
 ## English
 
+### v0.2.1
+- **Root cause:** aapt2 decompresses `assets/*.tsv.gz` and strips `.gz`, so the dictionary never opened
+- Dictionary loads `.tsv.gz` or `.tsv`; CJK falls back to longest prefix (e.g. 这是 → 这)
+- Gloss resolved on SoftKeyView bind and cached; draw path only paints the cached string (battery-friendly)
+- Candidate-strip check cached on a view tag (no parent walk every frame); high-contrast amber/blue gloss
+
+
 GboardGloss shows a translation right above each Gboard suggestion, so you pick up vocabulary in another language while you type. Inspired by [Qingjian 青简](https://github.com/qingjian-team/qingjian).
 
-> **Status:** v0.2 builds, but injection has **not yet been verified on a real device**. Test reports with `[gloss]` logs are welcome.
+> **Status:** v0.2.1 fixes “injected but no gloss”. Force-stop Gboard after updating. Please share `[gloss]` logs.
 
 ### Features
 - LSPosed module scoped to Gboard only (`com.google.android.inputmethod.latin`)
@@ -98,7 +111,7 @@ GboardGloss shows a translation right above each Gboard suggestion, so you pick 
 - Gboard (analyzed against 18.4.1)
 
 ### Install & use
-1. Download `GboardGloss-0.2.apk` from [Releases](https://github.com/ziyuw-Plank/gboard-gloss/releases) and install it
+1. Download `GboardGloss-0.2.1.apk` from [Releases](https://github.com/ziyuw-Plank/gboard-gloss/releases) and install it
 2. Enable the module in LSPosed and tick Gboard in its scope (tick the module itself too so the settings page can show status)
 3. Force-stop Gboard
 4. Open GboardGloss and choose a target language
