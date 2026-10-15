@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 420" role="img" aria-labelledby="title desc">
+  <title id="title">GboardGloss architecture</title>
+  <desc id="desc">LSPosed injects the module into Gboard SoftKeyView; gloss overlay draws under candidates</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#5F6368"/>
+    </marker>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+  <rect width="720" height="420" fill="#F8FAFC"/>
+  <text x="24" y="36" font-family="Roboto,Segoe UI,sans-serif" font-size="18" font-weight="600" fill="#202124">Architecture · 架构</text>
+  <text x="24" y="58" font-family="Roboto,Segoe UI,sans-serif" font-size="12" fill="#5F6368">LSPosed → Gboard SoftKeyView → gloss overlay (draw only)</text>
+
+  <rect x="40" y="90" width="160" height="72" rx="16" fill="#E8F0FE" stroke="#1A73E8" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="120" y="122" text-anchor="middle" font-family="Roboto,Segoe UI,sans-serif" font-size="14" font-weight="600" fill="#174EA6">LSPosed / Vector</text>
+  <text x="120" y="142" text-anchor="middle" font-family="Roboto,Segoe UI,sans-serif" font-size="11" fill="#1967D2">Zygisk scope: Gboard</text>
+
+  <line x1="200" y1="126" x2="268" y2="126" stroke="#5F6368" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="270" y="90" width="180" height="72" rx="16" fill="#E6F4EA" stroke="#34A853" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="360" y="122" text-anchor="middle" font-family="Roboto,Segoe UI,sans-serif" font-size="14" font-weight="600" fill="#137333">GboardGloss Hook</text>
+  <text x="360" y="142" text-anchor="middle" font-family="Roboto,Segoe UI,sans-serif" font-size="11" fill="#137333">onCreate / SoftKeyView</text>
+
+  <line x1="450" y1="126" x2="518" y2="126" stroke="#5F6368" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="520" y="90" width="160" height="72" rx="16" fill="#FEF7E0" stroke="#F9AB00" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="600" y="122" text-anchor="middle" font-family="Roboto,Segoe UI,sans-serif" font-size="14" font-weight="600" fill="#B06000">Gboard IME</text>
+  <text x="600" y="142" text-anchor="middle" font-family="Roboto,Segoe UI,sans-serif" font-size="11" fill="#B06000">latin inputmethod</text>
+
+  <rect x="120" y="220" width="480" height="150" rx="20" fill="#FFFFFF" stroke="#DADCE0" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="360" y="250" text-anchor="middle" font-family="Roboto,Segoe UI,sans-serif" font-size="13" font-weight="600" fill="#202124">Candidate strip · 候选栏</text>
+
+  <rect x="150" y="270" width="100" height="64" rx="12" fill="#F1F3F4"/>
+  <text x="200" y="298" text-anchor="middle" font-family="Roboto,Segoe UI,sans-serif" font-size="13" fill="#202124">这是</text>
+  <text x="200" y="318" text-anchor="middle" font-family="Roboto,Segoe UI,sans-serif" font-size="11" fill="#5F6368" opacity="0.85">this · be</text>
+
+  <rect x="270" y="270" width="100" height="64" rx="12" fill="#F1F3F4"/>
+  <text x="320" y="298" text-anchor="middle" font-family="Roboto,Segoe UI,sans-serif" font-size="13" fill="#202124">我不理解</text>
+  <text x="320" y="318" text-anchor="middle" font-family="Roboto,Segoe UI,sans-serif" font-size="11" fill="#5F6368" opacity="0.85">not comprehend</text>
+
+  <rect x="390" y="270" width="100" height="64" rx="12" fill="#F1F3F4"/>
+  <text x="440" y="298" text-anchor="middle" font-family="Roboto,Segoe UI,sans-serif" font-size="13" fill="#202124">hello</text>
+  <text x="440" y="318" text-anchor="middle" font-family="Roboto,Segoe UI,sans-serif" font-size="11" fill="#5F6368" opacity="0.85">你好</text>
+
+  <rect x="510" y="270" width="60" height="64" rx="12" fill="#E8F0FE" stroke="#1A73E8" stroke-dasharray="4 3"/>
+  <text x="540" y="298" text-anchor="middle" font-family="Roboto,Segoe UI,sans-serif" font-size="10" fill="#174EA6">overlay</text>
+  <text x="540" y="314" text-anchor="middle" font-family="Roboto,Segoe UI,sans-serif" font-size="10" fill="#174EA6">only</text>
+
+  <text x="360" y="400" text-anchor="middle" font-family="Roboto,Segoe UI,sans-serif" font-size="11" fill="#5F6368">Drawing is additive — Gboard selection &amp; commit stay unchanged · 仅叠加绘制，不改选词上屏</text>
+</svg>
