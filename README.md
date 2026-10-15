@@ -4,7 +4,7 @@
 
 在谷歌输入法（Gboard）的候选词旁叠加显示目标语言译词，打字时顺便学外语。灵感来自 [青简 Qingjian](https://github.com/qingjian-team/qingjian)。
 
-> **状态：** v0.5.0 — 混合翻译：单词用离线词典，短语用端侧神经网络翻译（ML Kit NMT），译文有语法。升级后强停 Gboard。
+> **状态：** v0.5.1 — 混合翻译：首选候选用端侧神经网络翻译（ML Kit NMT），其余候选优先离线词典，词典没把握时再交给 NMT。升级后强停 Gboard。
 
 ### v0.5.0
 - 短语改用端侧神经网络机器翻译（Google ML Kit NMT），整句翻译，语序和语法自然；单词仍走离线词典
@@ -44,13 +44,14 @@
 
 | 候选类型 | 处理方式 | 特点 |
 |---|---|---|
-| 单词 / 词表词条 | 离线词典（CC-CEDICT、JMdict、FreeDict）+ 领域词表 | 同步、亚毫秒、精确 |
-| 短语 / 句子 | 端侧神经网络机器翻译（ML Kit NMT） | 整句理解，语法正确 |
+| 第 1 个候选（首选） | 端侧神经网络机器翻译（ML Kit NMT）；失败时回退词典 | 整句理解，语法正确 |
+| 第 2 个及以后 | 离线词典（CC-CEDICT、JMdict、FreeDict）+ 领域词表；词典未命中或只能拼接时才用 NMT | 同步、亚毫秒、省电 |
 
 - **离线**：每种语言模型约 30 MB，下载一次后无需联网
 - **隐私**：翻译在本机完成，输入内容不上传
 - **省电**：异步 + 防抖（约 150 ms）+ 只翻前 3 个候选 + LRU/磁盘缓存；绘制路径只读缓存
-- **兜底**：NMT 结果到达前先显示词典译文（带语法修正），到达后替换
+- **兜底**：NMT 结果到达前先显示词典译文（带语法修正：否定、助动词、了、吗），到达后替换；NMT 不可用且语法没把握时短语留空
+- **可观测**：缺模型时在 Wi-Fi 下自动下载；超时的翻译在后台继续并写入缓存，客户端稍后重试；设置页显示 Gboard 最近一次调用状态
 
 ![Hybrid pipeline](docs/hybrid-pipeline.svg)
 
@@ -75,7 +76,7 @@
 ## 概念图
 | 图 | 说明 |
 |---|---|
-| [混合翻译](docs/hybrid-pipeline.svg) | 候选词 → 词典（单词）/ 端侧 NMT（短语）→ 缓存 → 译词叠加 |
+| [混合翻译](docs/hybrid-pipeline.svg) | 首选候选 → 端侧 NMT；其余 → 词典（没把握再 NMT）→ 缓存 → 译词叠加 |
 | [架构](docs/architecture.svg) | LSPosed / Vector 注入 → Hook SoftKeyView → 候选栏叠加译词 |
 | [查词流程](docs/lookup-flow.svg) | 领域词表 → 离线词典 → 可选在线补全（默认关） |
 | [控制中心](docs/control-center.svg) | Material You 设置：开关、语言、字号、词表、在线、调试 |
@@ -175,7 +176,7 @@ python3 tools/build_dicts.py   # 可选：重新生成词典
 
 GboardGloss shows a translation under each Gboard suggestion so you pick up vocabulary while you type. Inspired by [Qingjian 青简](https://github.com/qingjian-team/qingjian).
 
-> **Status:** v0.5.0 — hybrid translation: offline dictionary for words, on-device neural machine translation (ML Kit NMT) for phrases, so phrase glosses are grammatical. Force-stop Gboard after upgrading.
+> **Status:** v0.5.1 — hybrid translation: the top candidate uses on-device neural machine translation (ML Kit NMT); other candidates use the offline dictionary first and fall back to NMT only when the dictionary has no confident result. Force-stop Gboard after upgrading.
 
 ### v0.5.0
 - Phrases now use on-device neural machine translation (Google ML Kit NMT): whole-phrase translation with natural word order and grammar; single words still use the offline dictionary
@@ -190,13 +191,14 @@ Stitching dictionary words together gives a pile of words, not a sentence: no gr
 
 | Candidate | Engine | Notes |
 |---|---|---|
-| Word / glossary term | Offline dictionary + domain glossary | Synchronous, sub-millisecond, exact |
-| Phrase / sentence | On-device NMT (ML Kit) | Understands the whole phrase, grammatical |
+| Candidate #1 (top) | On-device NMT (ML Kit); dictionary if NMT fails | Understands the whole phrase, grammatical |
+| Candidates #2+ | Offline dictionary + domain glossary; NMT only on a miss or a stitched phrase | Synchronous, sub-millisecond, battery-friendly |
 
 - **Offline**: ~30 MB per language model, downloaded once
 - **Private**: translation happens on the device; nothing you type is uploaded
 - **Battery-friendly**: async + ~150 ms debounce + top-3 candidates only + LRU/disk cache; the draw path only reads cache
-- **Fallback**: grammar-fixed dictionary gloss shows first, replaced when NMT returns
+- **Fallback**: grammar-fixed dictionary gloss (negation, auxiliaries, aspect, questions) shows first, replaced when NMT returns; if NMT is unavailable and grammar is not confident, phrases stay blank
+- **Observable**: missing models auto-download on Wi-Fi; timed-out translations finish in the background into the cache and the client retries; Settings shows Gboard's last call status
 
 ![Hybrid pipeline](docs/hybrid-pipeline.svg)
 
@@ -229,7 +231,7 @@ Stitching dictionary words together gives a pile of words, not a sentence: no gr
 ### Concept diagrams
 | Diagram | What it shows |
 |---|---|
-| [Hybrid pipeline](docs/hybrid-pipeline.svg) | candidate → dictionary (word) / on-device NMT (phrase) → cache → gloss overlay |
+| [Hybrid pipeline](docs/hybrid-pipeline.svg) | top candidate → on-device NMT; others → dictionary (NMT if not confident) → cache → gloss overlay |
 | [Architecture](docs/architecture.svg) | LSPosed / Vector inject → SoftKeyView hook → gloss overlay |
 | [Lookup flow](docs/lookup-flow.svg) | Glossary → offline dicts → optional online (default off) |
 | [Control center](docs/control-center.svg) | Material You settings: enable, language, size, glossary, online, debug |

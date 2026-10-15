@@ -25,7 +25,7 @@ public final class MtClient {
   static int logs = 20;
 
   static final class Req {
-    final WeakReference<View> view; final String text, src, tgt;
+    final WeakReference<View> view; final String text, src, tgt; int tries;
     Req(View v, String text, String src, String tgt) { view = new WeakReference<>(v); this.text = text; this.src = src; this.tgt = tgt; }
   }
 
@@ -68,6 +68,8 @@ public final class MtClient {
       String s = b == null ? "null" : b.getString("s");
       if (!"ok".equals(s)) {
         note("mt '" + r.text + "' status=" + s);
+        if (("pending".equals(s) || "fail".equals(s)) && r.tries++ < 2) { bg.postDelayed(() -> run(r), 800L * r.tries); return; }
+        if ("downloading".equals(s)) { backoffUntil = SystemClock.uptimeMillis() + 15_000; return; }
         if ("nomodel".equals(s) || "off".equals(s) || "denied".equals(s)) backoffUntil = SystemClock.uptimeMillis() + 30_000;
         return;
       }

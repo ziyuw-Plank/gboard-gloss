@@ -123,7 +123,11 @@ public class SettingsActivity extends Activity {
           for (com.google.mlkit.nl.translate.TranslateRemoteModel m : set) have.add(m.getLanguage());
           StringBuilder b = new StringBuilder("模型状态：English 内置");
           for (String l : neededModels()) b.append(" · ").append(l).append(have.contains(l) ? " ✓" : " 未下载");
-          b.append("\n下载后完全离线运行，翻译在本机完成，不上传输入内容。");
+          String ls = sp.getString(Prefs.MT_STATUS, null);
+          if (ls != null) b.append("\nGboard 最近一次调用：").append(ls).append("（")
+              .append(android.text.format.DateUtils.getRelativeTimeSpanString(sp.getLong(Prefs.MT_STATUS_AT, 0))).append("）");
+          else b.append("\nGboard 尚未调用过翻译服务：请强行停止 Gboard 后重试，或在 LSPosed 作用域勾选「系统框架」并重启。");
+          b.append("\n缺少的模型会在 Wi-Fi 下自动下载；下载后完全离线运行，不上传输入内容。");
           st.setText(b);
         })
         .addOnFailureListener(e -> st.setText("模型状态读取失败：" + e.getMessage()));

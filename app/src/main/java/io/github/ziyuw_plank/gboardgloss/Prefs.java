@@ -13,4 +13,6 @@ public final class Prefs {
   /** On-device NMT for phrases (default on; needs downloaded models). */
   public static final String MT = "mt";
   public static final String WIFI_ONLY = "wifi_only";
+  public static final String MT_STATUS = "mt_status";
+  public static final String MT_STATUS_AT = "mt_status_at";
 }

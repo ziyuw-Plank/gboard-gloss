@@ -524,8 +524,8 @@ public final class Dictionary {
     }
     String r = String.join(" ", out).replaceAll("\\s+", " ").trim()
         .replace("where at", "where").replace("where go", "where to go");
-    r = Grammar.fix(r);
-    if (r.length() > 30) return null;
+    r = Grammar.fix(r, key);
+    if (r == null || r.length() > 30) return null;
     composedFlag = true;
     return r;
   }

@@ -1,7 +1,7 @@
 plugins { id 'com.android.application' }
 android {
   namespace 'io.github.ziyuw_plank.gboardgloss'; compileSdk 34
-  defaultConfig { applicationId 'io.github.ziyuw_plank.gboardgloss'; minSdk 27; targetSdk 34; versionCode 9; versionName "0.5.0"; ndk { abiFilters "arm64-v8a", "armeabi-v7a" } }
+  defaultConfig { applicationId 'io.github.ziyuw_plank.gboardgloss'; minSdk 27; targetSdk 34; versionCode 10; versionName "0.5.1"; ndk { abiFilters "arm64-v8a", "armeabi-v7a" } }
   compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
   buildTypes { release { minifyEnabled false; signingConfig signingConfigs.debug } }
 }

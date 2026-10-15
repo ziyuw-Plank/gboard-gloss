@@ -30,3 +30,16 @@ Iterations:
 4. Short-sense selection for long idiom explanations; Japanese dictionary consulted for kanji words unknown to Chinese.
 5. Builtin glossary: everyday chat expressions, modern senses of common words, computing/AI and science terms.
 6. Safety rules: no stitching opaque 3+ part compounds, no two-bare-character guesses.
+
+## v0.5.1 (grammar of the offline fallback)
+Sentence-level grammar pass (`Grammar.fix(gloss, key)`): do-support negation with subject agreement and base verb, everyday-sense preference, 了 → simple past, 吗 → yes/no question inversion (modal or do/does), and a final confidence check that blanks anything still ungrammatical.
+Regression probes for negation / modal / aspect / question patterns all come out grammatical.
+
+| set | v0.5.1 coverage / acc-on-shown / garbage |
+|---|---|
+| zh dev (590) | 99.7 / 99.7 / 0.3 |
+| zh unseen (251) | 99.6 / 99.6 / 0.4 |
+| zh blind (141) | 95.0 / 97.8 / 2.1 |
+| zh traditional (25) | 96.0 / 100 / 0.0 |
+| en→zh (40) | 100 / 82.5 / 17.5 |
+| ja→en (30) | 100 / 83.3 / 16.7 |
