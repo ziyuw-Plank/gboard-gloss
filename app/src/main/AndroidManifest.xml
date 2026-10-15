@@ -1,11 +1,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
   <uses-permission android:name="android.permission.INTERNET"/>
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+  <queries><package android:name="com.google.android.inputmethod.latin"/></queries>
   <application android:label="Gboard 译词" android:theme="@style/AppTheme" android:icon="@mipmap/ic_launcher">
     <meta-data android:name="xposedmodule" android:value="true"/>
     <meta-data android:name="xposeddescription" android:value="在 Gboard 候选词旁显示目标语言译词（仅叠加显示）"/>
     <meta-data android:name="xposedminversion" android:value="93"/>
     <meta-data android:name="xposedscope" android:resource="@array/scope"/>
     <meta-data android:name="xposedsharedprefs" android:value="true"/>
+    <!-- exported without permission (Gboard cannot declare ours); caller UID is checked in call() -->
+    <provider android:name=".MtProvider" android:authorities="io.github.ziyuw_plank.gboardgloss.mt" android:exported="true"/>
     <activity android:name=".SettingsActivity" android:exported="true">
       <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
     </activity>

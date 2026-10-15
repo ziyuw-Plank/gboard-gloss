@@ -524,8 +524,18 @@ public final class Dictionary {
     }
     String r = String.join(" ", out).replaceAll("\\s+", " ").trim()
         .replace("where at", "where").replace("where go", "where to go");
+    r = Grammar.fix(r);
     if (r.length() > 30) return null;
+    composedFlag = true;
     return r;
+  }
+
+  static boolean composedFlag;
+  private static final Set<String> composed = new HashSet<>();
+
+  /** True if the last offline result for (word,tgt) was stitched from segments (not a whole entry). */
+  public static synchronized boolean wasComposed(String word, String tgt) {
+    return word != null && composed.contains(word.trim() + "\t" + tgt);
   }
 
   static String findFlex(D d, String key, boolean cjk) {
@@ -608,6 +618,7 @@ public final class Dictionary {
     }
 
     String result = null;
+    composedFlag = false;
     List<String> srcs = detect(word);
     if (srcs.size() == 2 && "zh".equals(srcs.get(0)) && "en".equals(tgt)) {
       D z = get(o, "zh", "en"), j = get(o, "ja", "en");
@@ -639,6 +650,9 @@ public final class Dictionary {
       }
     }
 
+    if (composedFlag && result != null) composed.add(ck);
+    if (result != null && !composedFlag && !isCjkKey(srcs.isEmpty() ? "" : srcs.get(0)) && word.indexOf(' ') > 0) composed.add(ck);
+    if (composed.size() > 4096) composed.clear();
     transCache.put(ck, result == null ? NONE : result);
     return result;
   }

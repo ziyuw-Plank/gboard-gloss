@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 420" role="img" aria-labelledby="t d" font-family="Roboto, 'Google Sans', 'Noto Sans SC', sans-serif">
+  <title id="t">Hybrid translation pipeline: dictionary for words, on-device NMT for phrases</title>
+  <desc id="d">Gboard candidate goes to the offline dictionary when it is a word, or to on-device neural machine translation (ML Kit) in the module app when it is a phrase; results are cached and drawn as a gloss overlay.</desc>
+  <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#5f6368"/></marker></defs>
+  <rect width="760" height="420" rx="24" fill="#f8f9fa"/>
+  <text x="380" y="40" text-anchor="middle" font-size="20" font-weight="500" fill="#202124">词典 + 端侧神经网络翻译 · Dictionary + on-device NMT</text>
+  <g font-size="14" fill="#202124">
+    <rect x="30" y="170" width="140" height="64" rx="16" fill="#e8f0fe"/><text x="100" y="198" text-anchor="middle">Gboard 候选词</text><text x="100" y="218" text-anchor="middle" font-size="12" fill="#5f6368">candidate</text>
+    <rect x="240" y="80" width="200" height="72" rx="16" fill="#e6f4ea"/><text x="340" y="110" text-anchor="middle">单词 → 离线词典</text><text x="340" y="132" text-anchor="middle" font-size="12" fill="#5f6368">word → dictionary (sync, &lt;0.1 ms)</text>
+    <rect x="240" y="250" width="200" height="88" rx="16" fill="#fef7e0"/><text x="340" y="278" text-anchor="middle">短语 → 端侧 NMT</text><text x="340" y="298" text-anchor="middle" font-size="12" fill="#5f6368">phrase → ML Kit (module app)</text><text x="340" y="318" text-anchor="middle" font-size="12" fill="#5f6368">debounce 150 ms · top 3 · async</text>
+    <rect x="500" y="170" width="110" height="64" rx="16" fill="#f3e8fd"/><text x="555" y="198" text-anchor="middle">缓存</text><text x="555" y="218" text-anchor="middle" font-size="12" fill="#5f6368">LRU + disk</text>
+    <rect x="640" y="170" width="100" height="64" rx="16" fill="#e8f0fe"/><text x="690" y="198" text-anchor="middle">译词叠加</text><text x="690" y="218" text-anchor="middle" font-size="12" fill="#5f6368">overlay</text>
+  </g>
+  <g stroke="#5f6368" stroke-width="2" fill="none" marker-end="url(#a)">
+    <path d="M170 190 C205 160 210 125 238 118"/><path d="M170 215 C205 245 210 290 238 292"/>
+    <path d="M440 116 C475 125 480 180 498 192"/><path d="M440 292 C475 285 480 230 498 214"/>
+    <path d="M610 202 L638 202"/>
+  </g>
+  <text x="340" y="370" text-anchor="middle" font-size="12" fill="#5f6368">短语先显示词典 + 语法修正的兜底译文，NMT 就绪后替换 · fallback first, NMT replaces when ready</text>
+  <text x="380" y="398" text-anchor="middle" font-size="12" fill="#5f6368">ContentProvider IPC（仅 Gboard UID）· 模型下载后完全离线 · 输入不出设备 / on-device, private, offline</text>
+</svg>

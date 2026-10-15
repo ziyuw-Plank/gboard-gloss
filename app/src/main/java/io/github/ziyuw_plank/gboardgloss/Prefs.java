@@ -10,4 +10,7 @@ public final class Prefs {
   public static final String ONLINE = "online";
   /** User-imported glossary TSV body (exact matches). */
   public static final String USER_GLOSSARY = "user_glossary";
+  /** On-device NMT for phrases (default on; needs downloaded models). */
+  public static final String MT = "mt";
+  public static final String WIFI_ONLY = "wifi_only";
 }

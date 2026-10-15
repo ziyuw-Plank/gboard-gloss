@@ -19,6 +19,19 @@
   </com.google.android.material.card.MaterialCardView>
   <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" app:contentPadding="20dp" android:layout_marginBottom="12dp">
     <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
+      <TextView android:text="短语智能翻译（端侧神经网络）" android:textAppearance="?attr/textAppearanceTitleMedium" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+      <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/mt" android:text="短语用端侧翻译（单词仍用词典）" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+      <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/wifi_only" android:text="仅在 Wi‑Fi 下下载模型" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+      <TextView android:id="@+id/mt_status" android:textAppearance="?attr/textAppearanceBodySmall" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:layout_marginBottom="8dp"/>
+      <com.google.android.material.button.MaterialButton android:id="@+id/mt_download" style="@style/Widget.Material3.Button.TonalButton" android:text="下载所需语言模型（每种约 30 MB）" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+      <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:hint="试一试：在这里用 Gboard 打字" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp">
+        <com.google.android.material.textfield.TextInputEditText android:id="@+id/try_input" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+      </com.google.android.material.textfield.TextInputLayout>
+      <TextView android:id="@+id/try_out" android:textAppearance="?attr/textAppearanceBodyMedium" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp"/>
+    </LinearLayout>
+  </com.google.android.material.card.MaterialCardView>
+  <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" app:contentPadding="20dp" android:layout_marginBottom="12dp">
+    <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
       <TextView android:text="译词字号" android:textAppearance="?attr/textAppearanceTitleMedium" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
       <com.google.android.material.slider.Slider android:id="@+id/size" android:valueFrom="8" android:valueTo="14" android:stepSize="1" android:layout_width="match_parent" android:layout_height="wrap_content"/>
       <TextView android:id="@+id/dict" android:textAppearance="?attr/textAppearanceBodySmall" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
