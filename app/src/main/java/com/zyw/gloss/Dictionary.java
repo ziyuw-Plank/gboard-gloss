@@ -7,6 +7,14 @@ import java.util.zip.GZIPInputStream;
 /**
  * Offline dictionaries: assets/dicts/&lt;src&gt;_&lt;tgt&gt;.tsv[.gz], lines "key\tgloss", sorted by UTF-8 bytes.
  * aapt2 decompresses *.gz in assets and strips the .gz suffix, so we try both .tsv.gz and .tsv.
+ *
+ * CJK matching (multi-char candidates):
+ * 1) exact whole key
+ * 2) 不/没 + rest composition
+ * 3) strip leading pronoun, then exact / 不-compose / prefix≥2
+ * 4) longest prefix with length ≥ 2 (never fall back to a single char)
+ * 5) bipartite segment when both parts match well
+ * Never show a lone first-character gloss for a multi-character candidate.
  */
 public final class Dictionary {
   public interface Opener { InputStream open(String name) throws IOException; }
@@ -23,6 +31,11 @@ public final class Dictionary {
       };
   /** Null-object for negative cache (no translation). */
   private static final String NONE = "\0";
+
+  private static final String[] PRONOUNS = {
+      "我们", "你们", "他们", "她们", "它们", "咱们",
+      "我", "你", "他", "她", "它", "您", "咱"
+  };
 
   static synchronized D get(Opener o, String s, String t) {
     String k = s + "_" + t;
@@ -96,14 +109,151 @@ public final class Dictionary {
     return null;
   }
 
-  /** Exact match, then longest CJK/kana prefix (so 这是 → 这). */
-  static String findFlex(D d, String key, boolean prefixOk) {
-    String r = find(d, key);
-    if (r != null || !prefixOk || key.length() <= 1) return r;
-    for (int len = key.length() - 1; len >= 1; len--) {
-      r = find(d, key.substring(0, len));
+  /** First sense only; strip leading "to "; trim noise; cap length. */
+  static String cleanGloss(String g) {
+    if (g == null) return null;
+    int semi = g.indexOf(';');
+    if (semi >= 0) g = g.substring(0, semi);
+    int slash = g.indexOf('/');
+    if (slash >= 0) g = g.substring(0, slash);
+    g = g.trim();
+    if (g.regionMatches(true, 0, "to ", 0, 3)) g = g.substring(3).trim();
+    g = g.replaceAll("\\s*\\([^)]*\\)", "").trim();
+    if (g.length() > 28) {
+      int sp = g.lastIndexOf(' ', 28);
+      g = (sp > 10 ? g.substring(0, sp) : g.substring(0, 28)).trim();
+    }
+    return g.isEmpty() ? null : g;
+  }
+
+  static String negateEn(String g) {
+    String c = cleanGloss(g);
+    if (c == null) return null;
+    if (c.regionMatches(true, 0, "not ", 0, 4)) return c;
+    return "not " + c;
+  }
+
+  /** Longest prefix match with length ≥ minLen. */
+  static String findLongestPrefix(D d, String key, int minLen) {
+    if (key.length() <= minLen) return null;
+    for (int len = key.length() - 1; len >= minLen; len--) {
+      String r = find(d, key.substring(0, len));
       if (r != null) return r;
     }
+    return null;
+  }
+
+  static String stripLeadingPronoun(String key) {
+    for (String p : PRONOUNS) {
+      if (key.startsWith(p) && key.length() > p.length()) return key.substring(p.length());
+    }
+    return null;
+  }
+
+  /** 不/没 + known word → "not …" */
+  static String findNegation(D d, String key) {
+    if (key.length() < 2) return null;
+    char c0 = key.charAt(0);
+    if (c0 != '不' && c0 != '没') return null;
+    String base = find(d, key.substring(1));
+    if (base == null) return null;
+    return negateEn(base);
+  }
+
+  /**
+   * Match one segment: exact; else 不-compose; else prefix≥2 for multi-char.
+   * Single-char parts: exact only.
+   */
+  static String matchPart(D d, String part) {
+    if (part.isEmpty()) return null;
+    String r = find(d, part);
+    if (r != null) return r;
+    r = findNegation(d, part);
+    if (r != null) return r; // already cleaned via negateEn
+    if (part.length() >= 3) {
+      r = findLongestPrefix(d, part, 2);
+      if (r != null) return r;
+    }
+    return null;
+  }
+
+  static boolean isCleanedNegation(String g) {
+    return g != null && g.regionMatches(true, 0, "not ", 0, 4);
+  }
+
+  /**
+   * Split into two parts; both must match well. Prefer splits where the
+   * shorter part is as long as possible and at least one part is multi-char.
+   * Returns already-cleaned joined gloss, or null.
+   */
+  static String findSegmented(D d, String key) {
+    int n = key.length();
+    if (n < 2) return null;
+    String best = null;
+    int bestScore = -1;
+    for (int i = 1; i < n; i++) {
+      String L = key.substring(0, i);
+      String R = key.substring(i);
+      // Two single-char parts: only when BOTH have exact dict hits (e.g. 这+是).
+      boolean bothSingle = L.length() < 2 && R.length() < 2;
+      String gLraw;
+      String gRraw;
+      if (bothSingle) {
+        gLraw = find(d, L);
+        gRraw = find(d, R);
+      } else {
+        gLraw = matchPart(d, L);
+        gRraw = matchPart(d, R);
+      }
+      if (gLraw == null || gRraw == null) continue;
+      String gL = isCleanedNegation(gLraw) ? gLraw : cleanGloss(gLraw);
+      String gR = isCleanedNegation(gRraw) ? gRraw : cleanGloss(gRraw);
+      if (gL == null || gR == null) continue;
+      int score = Math.min(L.length(), R.length()) * 100 + L.length() + R.length();
+      if (R.length() >= 2) score += 10;
+      if (L.length() >= 2) score += 5;
+      if (score > bestScore) {
+        bestScore = score;
+        best = gL + " · " + gR;
+      }
+    }
+    return best;
+  }
+
+  /**
+   * CJK-aware lookup. For multi-char keys never returns a single-char-only hit.
+   * Returned string is cleaned (except segmented joins which are pre-cleaned).
+   */
+  static String findFlex(D d, String key, boolean cjk) {
+    String r = find(d, key);
+    if (r != null) return cleanGloss(r);
+
+    if (!cjk) return null;
+
+    // Single-char candidate: exact only (already missed)
+    if (key.length() <= 1) return null;
+
+    r = findNegation(d, key);
+    if (r != null) return r;
+
+    String stripped = stripLeadingPronoun(key);
+    // Only use pronoun-strip when the remainder is still multi-char, so we never
+    // collapse e.g. 我不 → lone 不, or 我不理解 → lone 我.
+    if (stripped != null && stripped.length() >= 2) {
+      r = find(d, stripped);
+      if (r != null) return cleanGloss(r);
+      r = findNegation(d, stripped);
+      if (r != null) return r;
+      r = findLongestPrefix(d, stripped, 2);
+      if (r != null) return cleanGloss(r);
+    }
+
+    r = findLongestPrefix(d, key, 2);
+    if (r != null) return cleanGloss(r);
+
+    r = findSegmented(d, key);
+    if (r != null) return r;
+
     return null;
   }
 
@@ -134,6 +284,7 @@ public final class Dictionary {
   static String pivotKey(String g) {
     g = g.split("[;,]")[0].trim().toLowerCase(Locale.ROOT);
     if (g.startsWith("to ")) g = g.substring(3);
+    if (g.startsWith("not ")) g = g.substring(4);
     return g;
   }
 
@@ -154,21 +305,21 @@ public final class Dictionary {
     for (String s : detect(word)) {
       if (s.equals(tgt)) { transCache.put(ck, NONE); return null; }
       String key = isCjkKey(s) ? word : word.toLowerCase(Locale.ROOT);
-      boolean prefix = isCjkKey(s);
+      boolean cjk = isCjkKey(s);
       D d = get(o, s, tgt);
       if (d != null) {
-        String r = findFlex(d, key, prefix);
+        String r = findFlex(d, key, cjk);
         if (r != null) { result = r; break; }
         continue;
       }
       D se = get(o, s, "en"), et = get(o, "en", tgt);
       if (se != null) {
-        String en = findFlex(se, key, prefix);
+        String en = findFlex(se, key, cjk);
         if (en != null) {
           if (tgt.equals("en")) { result = en; break; }
           if (et != null) {
             String r = find(et, pivotKey(en));
-            if (r != null) { result = r; break; }
+            if (r != null) { result = cleanGloss(r); break; }
           }
         }
       }
