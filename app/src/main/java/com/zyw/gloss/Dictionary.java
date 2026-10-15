@@ -1,15 +1,52 @@
 package com.zyw.gloss;
-import android.content.Context; import java.io.*; import java.util.HashMap;
-/** Pluggable offline dictionary: assets/dict_<lang>.tsv, lines "汉字\tgloss". */
+import java.io.*; import java.nio.charset.StandardCharsets; import java.util.*; import java.util.zip.*;
+/** Offline dictionaries: assets/dicts/<src>_<tgt>.tsv.gz, lines "key\tgloss", sorted by UTF-8 bytes. Binary search over raw bytes (low memory). */
 public final class Dictionary {
-  private static final HashMap<String, HashMap<String,String>> cache = new HashMap<>();
-  public static synchronized HashMap<String,String> load(Context moduleCtx, String lang) {
-    HashMap<String,String> m = cache.get(lang); if (m != null) return m; m = new HashMap<>();
-    try (BufferedReader r = new BufferedReader(new InputStreamReader(moduleCtx.getAssets().open("dict_"+lang+".tsv"), "UTF-8"))) {
-      String l; while ((l = r.readLine()) != null) { int t = l.indexOf('\t'); if (t > 0 && !m.containsKey(l.substring(0,t))) m.put(l.substring(0,t), l.substring(t+1)); }
-    } catch (IOException ignored) {}
-    cache.put(lang, m); return m;
+  public interface Opener { InputStream open(String name) throws IOException; }
+  public static final String[] LANGS = {"en","zh","ja","de","fr","es","ru"};
+  static final class D { byte[] b; int[] off; int n; }
+  private static final HashMap<String, D> cache = new HashMap<>();
+  private static final Set<String> missing = new HashSet<>();
+  static synchronized D get(Opener o, String s, String t) {
+    String k = s + "_" + t; D d = cache.get(k); if (d != null) return d; if (missing.contains(k)) return null;
+    try (InputStream in = new GZIPInputStream(new BufferedInputStream(o.open("dicts/" + k + ".tsv.gz")), 65536)) {
+      ByteArrayOutputStream bo = new ByteArrayOutputStream(1 << 22); byte[] buf = new byte[65536]; int r;
+      while ((r = in.read(buf)) > 0) bo.write(buf, 0, r);
+      d = new D(); d.b = bo.toByteArray(); int c = 0; for (byte x : d.b) if (x == '\n') c++;
+      d.off = new int[c + 1]; d.off[0] = 0; int j = 1; for (int i = 0; i < d.b.length; i++) if (d.b[i] == '\n' && j <= c) d.off[j++] = i + 1;
+      d.n = c; cache.put(k, d); return d;
+    } catch (Throwable e) { missing.add(k); return null; }
   }
-  public static int count(Context c, String lang) { return load(c, lang).size(); }
-  public static String lookup(Context c, String lang, String word) { return word == null ? null : load(c, lang).get(word); }
+  public static boolean has(Opener o, String s, String t) { return get(o, s, t) != null; }
+  public static int size(Opener o, String s, String t) { D d = get(o, s, t); return d == null ? 0 : d.n; }
+  static String find(D d, String key) {
+    byte[] k = key.getBytes(StandardCharsets.UTF_8); int lo = 0, hi = d.n - 1;
+    while (lo <= hi) { int m = (lo + hi) >>> 1, p = d.off[m], c = 0, i = 0;
+      for (;; i++) { int a = d.b[p + i] & 0xff; if (a == '\t') a = -1; int bb = i < k.length ? (k[i] & 0xff) : -1;
+        if (a == -1 && bb == -1) { c = 0; break; } if (a != bb) { c = a - bb; break; } }
+      if (c == 0) { int s = p + k.length + 1, e = s; while (e < d.b.length && d.b[e] != '\n') e++; return new String(d.b, s, e - s, StandardCharsets.UTF_8); }
+      if (c < 0) lo = m + 1; else hi = m - 1; }
+    return null;
+  }
+  /** Script-based source detection; returns candidate source languages in try order. */
+  public static List<String> detect(String w) {
+    boolean han = false, kana = false, hangul = false, cyr = false, latin = false;
+    for (int i = 0; i < w.length(); i++) { Character.UnicodeScript sc; try { sc = Character.UnicodeScript.of(w.codePointAt(i)); } catch (Exception e) { continue; }
+      switch (sc) { case HAN: han = true; break; case HIRAGANA: case KATAKANA: kana = true; break; case HANGUL: hangul = true; break; case CYRILLIC: cyr = true; break; case LATIN: latin = true; break; default: } }
+    if (kana) return Arrays.asList("ja"); if (hangul) return Arrays.asList("ko"); if (han) return Arrays.asList("zh", "ja");
+    if (cyr) return Arrays.asList("ru"); if (latin) return Arrays.asList("en", "de", "fr", "es"); return Collections.emptyList();
+  }
+  static String pivotKey(String g) { g = g.split("[;,]")[0].trim().toLowerCase(Locale.ROOT); if (g.startsWith("to ")) g = g.substring(3); return g; }
+  /** Translate a word into target; direct dictionary first, else pivot via English. */
+  public static String translate(Opener o, String word, String tgt) {
+    if (word == null) return null; word = word.trim(); if (word.isEmpty() || word.length() > 30) return null;
+    for (String s : detect(word)) {
+      if (s.equals(tgt)) return null;
+      String key = s.equals("zh") || s.equals("ja") || s.equals("ko") ? word : word.toLowerCase(Locale.ROOT);
+      D d = get(o, s, tgt); if (d != null) { String r = find(d, key); if (r != null) return r; continue; }
+      D se = get(o, s, "en"), et = get(o, "en", tgt);
+      if (se != null) { String en = find(se, key); if (en != null) { if (tgt.equals("en")) return en; if (et != null) { String r = find(et, pivotKey(en)); if (r != null) return r; } } }
+    }
+    return null;
+  }
 }
