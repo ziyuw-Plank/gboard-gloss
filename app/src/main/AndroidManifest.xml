@@ -1,0 +1,12 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <application android:label="Gboard 译词" android:theme="@style/Theme.Material3.DayNight.NoActionBar">
+    <meta-data android:name="xposedmodule" android:value="true"/>
+    <meta-data android:name="xposeddescription" android:value="在 Gboard 候选词旁显示目标语言译词（仅叠加显示）"/>
+    <meta-data android:name="xposedminversion" android:value="93"/>
+    <meta-data android:name="xposedscope" android:resource="@array/scope"/>
+    <meta-data android:name="xposedsharedprefs" android:value="true"/>
+    <activity android:name=".SettingsActivity" android:exported="true">
+      <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
+    </activity>
+  </application>
+</manifest>
