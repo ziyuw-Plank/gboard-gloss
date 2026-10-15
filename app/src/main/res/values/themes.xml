@@ -1,0 +1,3 @@
+<resources><style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
+<item name="materialCardViewStyle">@style/Card</item><item name="android:statusBarColor">@android:color/transparent</item><item name="fontFamily">sans-serif</item></style>
+<style name="Card" parent="Widget.Material3.CardView.Filled"><item name="cardCornerRadius">24dp</item></style></resources>

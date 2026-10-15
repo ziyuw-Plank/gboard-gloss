@@ -6,7 +6,7 @@ public class SettingsActivity extends Activity {
   SharedPreferences sp;
   void bind(int id, String key, boolean def) { MaterialSwitch s = findViewById(id); s.setChecked(sp.getBoolean(key, def)); s.setOnCheckedChangeListener((v, c) -> sp.edit().putBoolean(key, c).apply()); }
   @SuppressWarnings("deprecation") @Override protected void onCreate(Bundle b) {
-    super.onCreate(b); setContentView(R.layout.settings);
+    com.google.android.material.color.DynamicColors.applyToActivityIfAvailable(this); super.onCreate(b); setContentView(R.layout.settings);
     try { sp = getSharedPreferences(Prefs.NAME, MODE_WORLD_READABLE); } catch (SecurityException e) { sp = getSharedPreferences(Prefs.NAME, 0); }
     ((TextView)findViewById(R.id.status)).setText(isActive() ? "✅ 模块已激活（作用域：Gboard）\n修改设置后约 2 秒内生效" : "⚠️ 模块未激活：在 LSPosed 中启用本模块并勾选 Gboard，然后强行停止 Gboard");
     bind(R.id.enable, Prefs.ENABLED, true); bind(R.id.banner, Prefs.BANNER, true); bind(R.id.debug, Prefs.DEBUG, false);
