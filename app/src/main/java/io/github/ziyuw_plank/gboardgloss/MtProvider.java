@@ -36,7 +36,31 @@ public class MtProvider extends ContentProvider {
   static Set<String> downloaded = new HashSet<>();
   static long downloadedAt;
 
+  static final HashMap<String, com.google.android.gms.tasks.Task<String>> inflight = new HashMap<>();
+  static final java.util.concurrent.ExecutorService BG = Executors.newSingleThreadExecutor();
+  static final Set<String> downloading = java.util.Collections.synchronizedSet(new HashSet<>());
+  static long lastStatusAt;
+
   @Override public boolean onCreate() { return true; }
+
+  /** Last provider status, shown in Settings so silent failures are visible. Throttled writes. */
+  static void status(SharedPreferences sp, String s) {
+    long now = System.currentTimeMillis();
+    if (now - lastStatusAt < 5_000 && s.equals("ok")) return;
+    lastStatusAt = now;
+    sp.edit().putString(Prefs.MT_STATUS, s).putLong(Prefs.MT_STATUS_AT, now).apply();
+  }
+
+  /** Missing model: start a download (Wi-Fi only unless the user allowed mobile data). One attempt per language per process. */
+  static void autoDownload(SharedPreferences sp, String... langs) {
+    com.google.mlkit.common.model.DownloadConditions.Builder b = new com.google.mlkit.common.model.DownloadConditions.Builder();
+    if (sp.getBoolean(Prefs.WIFI_ONLY, true)) b.requireWifi();
+    for (String l : langs) {
+      if (TranslateLanguage.ENGLISH.equals(l) || !downloading.add(l)) continue;
+      RemoteModelManager.getInstance().download(new TranslateRemoteModel.Builder(l).build(), b.build())
+          .addOnCompleteListener(BG, t -> { downloadedAt = 0; if (!t.isSuccessful()) downloading.remove(l); });
+    }
+  }
 
   synchronized PhraseCache cache() {
     if (cache == null) cache = new PhraseCache(3000, new File(getContext().getFilesDir(), "mt_cache.tsv"));
@@ -92,18 +116,41 @@ public class MtProvider extends ContentProvider {
     String hit = c.get(text, tgt);
     if (hit != null) { out.putString("s", "ok"); out.putString("r", hit); return out; }
     Set<String> have = downloadedModels(false);
-    if (!have.contains(src) || !have.contains(tgt)) { out.putString("s", "nomodel"); return out; }
+    if (!have.contains(src) || !have.contains(tgt)) {
+      autoDownload(sp, src, tgt);
+      out.putString("s", downloading.isEmpty() ? "nomodel" : "downloading"); status(sp, "nomodel " + src + ">" + tgt); return out;
+    }
     long t0 = System.nanoTime();
+    com.google.android.gms.tasks.Task<String> task;
+    String pk = tgt + "\t" + text;
+    synchronized (inflight) {
+      task = inflight.get(pk);
+      if (task == null) {
+        task = translator(src, tgt).translate(text);
+        inflight.put(pk, task);
+        final PhraseCache cc = c;
+        task.addOnCompleteListener(BG, tk -> {           // finishes even after a timeout → next call hits cache
+          synchronized (inflight) { inflight.remove(pk); }
+          if (tk.isSuccessful() && tk.getResult() != null) {
+            String rr = tk.getResult().trim();
+            if (!rr.isEmpty() && !rr.equalsIgnoreCase(text) && cc.put(text, tgt, rr)) cc.flush();
+          }
+        });
+      }
+    }
     try {
-      String r = Tasks.await(translator(src, tgt).translate(text), 1500, TimeUnit.MILLISECONDS);
+      String r = Tasks.await(task, 1500, TimeUnit.MILLISECONDS);
       if (r != null) r = r.trim();
       if (r == null || r.isEmpty() || r.equalsIgnoreCase(text)) { out.putString("s", "empty"); return out; }
-      if (c.put(text, tgt, r)) Executors.newSingleThreadExecutor().execute(c::flush);
+      if (c.put(text, tgt, r)) BG.execute(c::flush);
       out.putString("s", "ok");
       out.putString("r", r);
       out.putLong("ms", (System.nanoTime() - t0) / 1_000_000);
+      status(sp, "ok");
+    } catch (java.util.concurrent.TimeoutException e) {
+      out.putString("s", "pending"); status(sp, "pending (model warming up)");
     } catch (Exception e) {
-      out.putString("s", "fail");
+      out.putString("s", "fail"); status(sp, "fail " + e.getClass().getSimpleName() + ": " + e.getMessage());
     }
     return out;
   }

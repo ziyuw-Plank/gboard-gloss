@@ -264,6 +264,19 @@ public class Hook implements IXposedHookLoadPackage, IXposedHookZygoteInit {
     });
   }
 
+  /** True for the leftmost visible SoftKeyView in its row (Gboard's top-ranked candidate). */
+  static boolean isFirstCandidate(View v) {
+    ViewParent p = v.getParent();
+    if (!(p instanceof android.view.ViewGroup)) return false;
+    android.view.ViewGroup g = (android.view.ViewGroup) p;
+    for (int i = 0; i < g.getChildCount(); i++) {
+      View c = g.getChildAt(i);
+      if (c.getVisibility() != View.VISIBLE || !c.getClass().getName().endsWith("SoftKeyView")) continue;
+      return c == v;
+    }
+    return false;
+  }
+
   static boolean resolveIsCandidate(View v) {
     Object cached = v.getTag(R.id.gloss_is_candidate);
     if (cached instanceof Boolean) return (Boolean) cached;
@@ -362,9 +375,12 @@ public class Hook implements IXposedHookLoadPackage, IXposedHookZygoteInit {
     v.setTag(R.id.gloss_text, gloss);
 
     String src0 = Dictionary.detectPrimary(word);
-    boolean phrase = word.length() >= 2 && (Dictionary.wasComposed(word, lang) || gloss == null)
-        && (word.indexOf(' ') > 0 || (src0 != null && Dictionary.isCjkKey(src0) && word.length() >= 3) || Dictionary.wasComposed(word, lang));
-    if (phrase && src0 != null && !src0.equals(lang) && prefs.getBoolean(Prefs.MT, true)) {
+    // Candidate #1: neural MT is primary (dictionary gloss above is the instant fallback until MT answers,
+    // or if MT is off / unavailable / times out). Candidates #2+: dictionary first; MT only when the
+    // dictionary has no confident result (miss, or a stitched phrase).
+    boolean first = isFirstCandidate(v);
+    boolean needMt = first || gloss == null || Dictionary.wasComposed(word, lang);
+    if (needMt && src0 != null && !src0.equals(lang) && prefs.getBoolean(Prefs.MT, true)) {
       String hit = MtClient.peek(word, lang);
       if (hit != null) { v.setTag(R.id.gloss_text, Dictionary.fitGlossToken(hit, 40)); gloss = hit; }
       else MtClient.request(v.getContext(), v, word, src0, lang);

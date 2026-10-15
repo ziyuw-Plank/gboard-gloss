@@ -6,8 +6,8 @@
   <text x="380" y="40" text-anchor="middle" font-size="20" font-weight="500" fill="#202124">词典 + 端侧神经网络翻译 · Dictionary + on-device NMT</text>
   <g font-size="14" fill="#202124">
     <rect x="30" y="170" width="140" height="64" rx="16" fill="#e8f0fe"/><text x="100" y="198" text-anchor="middle">Gboard 候选词</text><text x="100" y="218" text-anchor="middle" font-size="12" fill="#5f6368">candidate</text>
-    <rect x="240" y="80" width="200" height="72" rx="16" fill="#e6f4ea"/><text x="340" y="110" text-anchor="middle">单词 → 离线词典</text><text x="340" y="132" text-anchor="middle" font-size="12" fill="#5f6368">word → dictionary (sync, &lt;0.1 ms)</text>
-    <rect x="240" y="250" width="200" height="88" rx="16" fill="#fef7e0"/><text x="340" y="278" text-anchor="middle">短语 → 端侧 NMT</text><text x="340" y="298" text-anchor="middle" font-size="12" fill="#5f6368">phrase → ML Kit (module app)</text><text x="340" y="318" text-anchor="middle" font-size="12" fill="#5f6368">debounce 150 ms · top 3 · async</text>
+    <rect x="240" y="80" width="200" height="72" rx="16" fill="#e6f4ea"/><text x="340" y="110" text-anchor="middle">其余候选 → 词典优先</text><text x="340" y="132" text-anchor="middle" font-size="12" fill="#5f6368">#2+ → dictionary first (sync)</text>
+    <rect x="240" y="250" width="200" height="88" rx="16" fill="#fef7e0"/><text x="340" y="278" text-anchor="middle">首选候选 → 端侧 NMT</text><text x="340" y="298" text-anchor="middle" font-size="12" fill="#5f6368">#1 → ML Kit (module app)</text><text x="340" y="318" text-anchor="middle" font-size="12" fill="#5f6368">debounce 150 ms · top 3 · async</text>
     <rect x="500" y="170" width="110" height="64" rx="16" fill="#f3e8fd"/><text x="555" y="198" text-anchor="middle">缓存</text><text x="555" y="218" text-anchor="middle" font-size="12" fill="#5f6368">LRU + disk</text>
     <rect x="640" y="170" width="100" height="64" rx="16" fill="#e8f0fe"/><text x="690" y="198" text-anchor="middle">译词叠加</text><text x="690" y="218" text-anchor="middle" font-size="12" fill="#5f6368">overlay</text>
   </g>
@@ -16,6 +16,6 @@
     <path d="M440 116 C475 125 480 180 498 192"/><path d="M440 292 C475 285 480 230 498 214"/>
     <path d="M610 202 L638 202"/>
   </g>
-  <text x="340" y="370" text-anchor="middle" font-size="12" fill="#5f6368">短语先显示词典 + 语法修正的兜底译文，NMT 就绪后替换 · fallback first, NMT replaces when ready</text>
+  <text x="340" y="370" text-anchor="middle" font-size="12" fill="#5f6368">词典没把握 → 交给 NMT；NMT 失败 → 词典兜底 · not confident → NMT; NMT fails → dictionary</text>
   <text x="380" y="398" text-anchor="middle" font-size="12" fill="#5f6368">ContentProvider IPC（仅 Gboard UID）· 模型下载后完全离线 · 输入不出设备 / on-device, private, offline</text>
 </svg>
