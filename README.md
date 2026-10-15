@@ -4,43 +4,8 @@
 
 在谷歌输入法（Gboard）的候选词旁叠加显示目标语言译词，打字时顺便学外语。灵感来自 [青简 Qingjian](https://github.com/qingjian-team/qingjian)。
 
-> **状态：** v0.5.1 — 混合翻译：首选候选用端侧神经网络翻译（ML Kit NMT），其余候选优先离线词典，词典没把握时再交给 NMT。升级后强停 Gboard。
-
-### v0.5.0
-- 短语改用端侧神经网络机器翻译（Google ML Kit NMT），整句翻译，语序和语法自然；单词仍走离线词典
-- 翻译在模块自身进程内完成，Gboard 通过轻量 IPC 异步获取，不阻塞绘制
-- 省电：停止输入约 150 ms 后才翻译，只翻前几个候选；内存 + 磁盘缓存，重复短语不再计算
-- 设置页可下载语言模型（可选仅 Wi‑Fi）、查看模型状态，并提供试译输入框；下载后完全离线
-- 词典兜底译文加入基础语法修正，NMT 未就绪时也更通顺
-- Android 11+ 包可见性适配（可选勾选“系统框架”作用域）
-
-### v0.4.0
-- 离线短语引擎：按词频分词，组合出符合英语语序的短语译文；处理否定、代词、语气词、量词与疑问句
-- 词义选择更准：优先常用读音和常用义项，过滤异体、方言、俚语、姓氏等误导义项
-- 英→中、日→中文汉字词的查词更准；繁体同样支持
-- 内置词表扩充：日常聊天用语、常见词的现代义、计算机/AI 与理工术语
-- 不确定时宁可留空；查词更快、内存更省
-- 新增 `tools/eval` 离线评测工具与结果记录（`tools/eval/RESULTS.md`）
-
-### v0.3.2
-- 包名按审核要求改为 `io.github.ziyuw_plank.gboardgloss`（GitHub 用户名中的连字符改为下划线）
-- 重新提交 LSPosed / Vector 模块仓库
-
-### v0.3.1
-- 尝试包名 `io.github.ziyuwplank.gboardgloss` + 概念图（`docs/*.svg`）；审核要求下划线后在 0.3.2 修正
-- 需卸载旧包 `com.zyw.gloss` 后重装
-
-
-### v0.3.0
-- 译词质量：仅展示可信的整词/词表命中；不再用劣质切分拼出译文
-- 内置领域词表（科技/物理等），设置页可导入自定义 TSV；精确匹配优先于通用词典
-- 视觉：候选下方次要标签、约 60% 透明度、跟随深浅色，避免刺眼对比色与拥挤重叠
-- 长度：按完整词元截断，避免半截省略
-- 可选在线补全（默认关）：离线未命中时异步请求并缓存，不阻塞绘制
-- 性能：查词与绘制仍走缓存路径，在线请求限流
-
 ## 混合翻译原理
-只靠词典逐词拼接，得到的只是单词堆叠，没有语法和语序。v0.5.0 起采用混合方案：
+只靠词典逐词拼接，得到的只是单词堆叠，没有语法和语序。因此采用混合方案：
 
 | 候选类型 | 处理方式 | 特点 |
 |---|---|---|
@@ -93,7 +58,7 @@
 > 模块仓库的 **GitHub Description** 需在网页上手动设为 `GboardGloss`（API 无权限），否则可能不在列表显示。
 
 ## 安装与使用
-1. 从 [Releases](https://github.com/ziyuw-Plank/gboard-gloss/releases) 下载 `GboardGloss-0.5.0.apk` 并安装
+1. 从 [Releases](https://github.com/ziyuw-Plank/gboard-gloss/releases) 下载最新的 `GboardGloss-*.apk` 并安装
 2. LSPosed 中启用模块，作用域勾选 Gboard（同时勾选模块本身，设置页才能显示状态）
 3. 强行停止 Gboard
 4. 打开 GboardGloss，选择目标语言；需要时可导入领域词表或打开在线补全
@@ -156,38 +121,10 @@ python3 tools/build_dicts.py   # 可选：重新生成词典
 <a id="english"></a>
 ## English
 
-### v0.3.2
-- Package id → `io.github.ziyuw_plank.gboardgloss` (underscore per Modules-Repo bot; hyphenated GitHub usernames are invalid)
-- Resubmitted to LSPosed / Vector module repository
-
-### v0.3.1
-- Package id change for [Xposed Module Repository](https://modules.lsposed.org) (LSPosed & Vector)
-- Concept diagrams added under `docs/`
-- Uninstall legacy `com.zyw.gloss` before installing
-
-
-### v0.3.0
-- Gloss quality: show only trusted whole-entry / glossary hits; no poor segmentation stitches
-- Built-in domain glossary plus Settings import for custom TSV; exact matches beat the general dictionaries
-- Visuals: soft secondary label under candidates (~60% alpha), light/dark aware; less crowding
-- Length: truncate on token boundaries only
-- Optional online fill-in (off by default): async + cached on offline miss; never blocks drawing
-- Performance: cached lookup/draw path kept; online calls are rate-limited
-
 GboardGloss shows a translation under each Gboard suggestion so you pick up vocabulary while you type. Inspired by [Qingjian 青简](https://github.com/qingjian-team/qingjian).
 
-> **Status:** v0.5.1 — hybrid translation: the top candidate uses on-device neural machine translation (ML Kit NMT); other candidates use the offline dictionary first and fall back to NMT only when the dictionary has no confident result. Force-stop Gboard after upgrading.
-
-### v0.5.0
-- Phrases now use on-device neural machine translation (Google ML Kit NMT): whole-phrase translation with natural word order and grammar; single words still use the offline dictionary
-- Translation runs in the module's own process; Gboard fetches it asynchronously over lightweight IPC and never blocks drawing
-- Battery: translates only after ~150 ms of no typing and only the leading candidates; memory + disk cache for repeats
-- Settings: download language models (optional Wi‑Fi only), model status, and a try-it box; fully offline after download
-- Basic grammar fixes for the dictionary fallback, so it reads better before NMT is ready
-- Android 11+ package-visibility handling (optional "System Framework" scope)
-
 ### Hybrid translation
-Stitching dictionary words together gives a pile of words, not a sentence: no grammar, no word order. Since v0.5.0:
+Stitching dictionary words together gives a pile of words, not a sentence: no grammar, no word order. So translation is hybrid:
 
 | Candidate | Engine | Notes |
 |---|---|---|
@@ -203,14 +140,6 @@ Stitching dictionary words together gives a pile of words, not a sentence: no gr
 ![Hybrid pipeline](docs/hybrid-pipeline.svg)
 
 **Android 11+ visibility:** Gboard must be able to see the module's ContentProvider. Open GboardGloss and type a few characters with Gboard in the "try it" box (the system lets the IME see the app it is typing into; repeat after reboot), or additionally tick "System Framework" in the LSPosed scope and reboot for a permanent fix (it only unhides this module from Gboard).
-
-### v0.4.0
-- Offline phrase engine: frequency-weighted segmentation, composed into English word order; handles negation, pronouns, particles, measure words and questions
-- Better sense choice: common reading and common sense first; variant, dialect, slang and surname senses filtered out
-- More accurate en→zh and Japanese kanji lookups; Traditional Chinese supported
-- Larger builtin glossary: everyday chat expressions, modern senses of common words, computing/AI and science terms
-- Shows nothing when unsure; faster lookups, lower memory
-- New `tools/eval` offline harness and results log (`tools/eval/RESULTS.md`)
 
 ### Features
 - LSPosed module scoped to Gboard only (`com.google.android.inputmethod.latin`)
@@ -248,7 +177,7 @@ Listed: [modules.lsposed.org page](https://modules.lsposed.org/module/io.github.
 > Set the modules-repo GitHub **Description** to `GboardGloss` in the browser (API lacks permission) or it may stay hidden.
 
 ### Install & use
-1. Download `GboardGloss-0.5.0.apk` from [Releases](https://github.com/ziyuw-Plank/gboard-gloss/releases) and install it
+1. Download the latest `GboardGloss-*.apk` from [Releases](https://github.com/ziyuw-Plank/gboard-gloss/releases) and install it
 2. Enable the module in LSPosed and tick Gboard (tick the module itself too for settings status)
 3. Force-stop Gboard
 4. Open GboardGloss, pick a target language; optionally import a glossary or enable online fill-in
