@@ -1,0 +1,54 @@
+# Built-in domain glossary (key<TAB>gloss). Exact match only. Lines starting with # ignored.
+# Physics / technical seed — extend via Settings → Import glossary
+横动量	transverse momentum
+横向动量	transverse momentum
+纵向动量	longitudinal momentum
+角动量	angular momentum
+线动量	linear momentum
+动量守恒	conservation of momentum
+动量	momentum
+动能	kinetic energy
+势能	potential energy
+机械能	mechanical energy
+相对论	relativity
+狭义相对论	special relativity
+广义相对论	general relativity
+量子力学	quantum mechanics
+量子场论	quantum field theory
+电磁场	electromagnetic field
+电磁波	electromagnetic wave
+光速	speed of light
+引力波	gravitational wave
+黑洞	black hole
+中微子	neutrino
+夸克	quark
+玻色子	boson
+费米子	fermion
+薛定谔	Schrödinger
+海森堡	Heisenberg
+不确定性原理	uncertainty principle
+波函数	wave function
+本征值	eigenvalue
+本征态	eigenstate
+哈密顿量	Hamiltonian
+拉格朗日量	Lagrangian
+四动量	four-momentum
+能级	energy level
+跃迁	transition
+散射截面	scattering cross section
+微分截面	differential cross section
+对撞机	collider
+加速器	accelerator
+同步辐射	synchrotron radiation
+超导	superconductivity
+半导	semiconductor
+半导体	semiconductor
+集成电路	integrated circuit
+机器学习	machine learning
+深度学习	deep learning
+神经网络	neural network
+大语言模型	large language model
+自然语言处理	natural language processing
+操作系统	operating system
+编译器	compiler
+开源	open source

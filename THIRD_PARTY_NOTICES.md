@@ -15,3 +15,9 @@ The converted TSV files are derivative works and are distributed under the same 
 
 This project is not affiliated with Google. Gboard is a trademark of Google LLC.
 本项目与 Google 无关，Gboard 是 Google LLC 的商标。
+
+## Optional online fill-in / 可选在线补全
+
+When the user enables “online fill-in” in Settings, GboardGloss may query the [MyMemory Translation API](https://mymemory.translated.net/) for offline misses. That feature is **off by default**. No API key is embedded; usage is subject to MyMemory’s own terms and rate limits. Results are cached in memory only for the process lifetime.
+
+用户在设置中开启「在线补全」后，离线未命中时可能请求 MyMemory 翻译接口。该功能**默认关闭**。未内置 API 密钥，须遵守 MyMemory 服务条款与频率限制。结果仅缓存在进程内存中。
