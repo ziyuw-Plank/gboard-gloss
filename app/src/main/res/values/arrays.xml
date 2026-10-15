@@ -1,2 +1,2 @@
-<resources><string-array name="scope"><item>com.google.android.inputmethod.latin</item></string-array>
+<resources><string-array name="scope"><item>com.google.android.inputmethod.latin</item><item>android</item></string-array>
 <string-array name="langs"><item>English</item><item>中文</item><item>日本語</item><item>Deutsch</item><item>Français</item><item>Español</item><item>Русский</item></string-array></resources>

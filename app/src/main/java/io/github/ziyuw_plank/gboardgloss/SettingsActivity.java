@@ -47,6 +47,15 @@ public class SettingsActivity extends Activity {
     bind(R.id.banner, Prefs.BANNER, true);
     bind(R.id.online, Prefs.ONLINE, false);
     bind(R.id.debug, Prefs.DEBUG, false);
+    bind(R.id.mt, Prefs.MT, true);
+    bind(R.id.wifi_only, Prefs.WIFI_ONLY, true);
+    findViewById(R.id.mt_download).setOnClickListener(v -> downloadModels());
+    android.widget.EditText in = findViewById(R.id.try_input);
+    in.addTextChangedListener(new android.text.TextWatcher() {
+      public void beforeTextChanged(CharSequence a, int b, int c, int d) {}
+      public void onTextChanged(CharSequence a, int b, int c, int d) {}
+      public void afterTextChanged(android.text.Editable e) { tryTranslate(e.toString()); }
+    });
 
     ChipGroup g = findViewById(R.id.langs);
     String[] n = getResources().getStringArray(R.array.langs);
@@ -65,6 +74,7 @@ public class SettingsActivity extends Activity {
         String code = (String) findViewById(ids.get(0)).getTag();
         sp.edit().putString(Prefs.LANG, code).apply();
         dict(code);
+        refreshModels();
       }
     });
 
@@ -90,6 +100,75 @@ public class SettingsActivity extends Activity {
     Dictionary.loadGlossary(getAssets()::open, sp.getString(Prefs.USER_GLOSSARY, ""));
     dict(cur);
     refreshGlossaryStatus();
+    refreshModels();
+  }
+
+  static final String[] SRC = {"zh", "en", "ja"};
+
+  java.util.LinkedHashSet<String> neededModels() {
+    java.util.LinkedHashSet<String> s = new java.util.LinkedHashSet<>();
+    String t = sp.getString(Prefs.LANG, "en");
+    s.add(t);
+    for (String x : SRC) if (!x.equals(t)) s.add(x);
+    s.remove("en"); // English ships with ML Kit
+    return s;
+  }
+
+  void refreshModels() {
+    TextView st = findViewById(R.id.mt_status);
+    com.google.mlkit.common.model.RemoteModelManager.getInstance()
+        .getDownloadedModels(com.google.mlkit.nl.translate.TranslateRemoteModel.class)
+        .addOnSuccessListener(set -> {
+          java.util.HashSet<String> have = new java.util.HashSet<>();
+          for (com.google.mlkit.nl.translate.TranslateRemoteModel m : set) have.add(m.getLanguage());
+          StringBuilder b = new StringBuilder("模型状态：English 内置");
+          for (String l : neededModels()) b.append(" · ").append(l).append(have.contains(l) ? " ✓" : " 未下载");
+          b.append("\n下载后完全离线运行，翻译在本机完成，不上传输入内容。");
+          st.setText(b);
+        })
+        .addOnFailureListener(e -> st.setText("模型状态读取失败：" + e.getMessage()));
+  }
+
+  void downloadModels() {
+    com.google.mlkit.common.model.DownloadConditions.Builder cb = new com.google.mlkit.common.model.DownloadConditions.Builder();
+    if (sp.getBoolean(Prefs.WIFI_ONLY, true)) cb.requireWifi();
+    com.google.mlkit.common.model.DownloadConditions cond = cb.build();
+    TextView st = findViewById(R.id.mt_status);
+    st.setText("正在下载模型…");
+    java.util.List<com.google.android.gms.tasks.Task<Void>> ts = new java.util.ArrayList<>();
+    for (String l : neededModels()) {
+      ts.add(com.google.mlkit.common.model.RemoteModelManager.getInstance().download(
+          new com.google.mlkit.nl.translate.TranslateRemoteModel.Builder(l).build(), cond));
+    }
+    com.google.android.gms.tasks.Tasks.whenAllComplete(ts).addOnCompleteListener(x -> {
+      MtProvider.downloadedAt = 0;
+      refreshModels();
+      Toast.makeText(this, "模型下载任务已完成", Toast.LENGTH_SHORT).show();
+    });
+  }
+
+  final android.os.Handler ui = new android.os.Handler(android.os.Looper.getMainLooper());
+  Runnable pendingTry;
+
+  /** Preview + also makes this app visible to Gboard (IME gets implicit visibility of its client). */
+  void tryTranslate(String text) {
+    if (pendingTry != null) ui.removeCallbacks(pendingTry);
+    TextView out = findViewById(R.id.try_out);
+    pendingTry = () -> new Thread(() -> {
+      String t = text.trim();
+      String tgt = sp.getString(Prefs.LANG, "en");
+      String src = Dictionary.detectPrimary(t);
+      String dict = t.isEmpty() ? null : Dictionary.translate(getAssets()::open, t, tgt);
+      String mt = null;
+      if (src != null && !src.equals(tgt) && !t.isEmpty()) {
+        android.os.Bundle ex = new android.os.Bundle(); ex.putString("src", src); ex.putString("tgt", tgt);
+        android.os.Bundle r = getContentResolver().call(android.net.Uri.parse("content://" + MtProvider.AUTH), MtProvider.M_TRANSLATE, t, ex);
+        mt = r == null ? null : ("ok".equals(r.getString("s")) ? r.getString("r") : "（" + r.getString("s") + "）");
+      }
+      final String d = dict, m = mt;
+      ui.post(() -> out.setText(t.isEmpty() ? "" : "词典：" + (d == null ? "—" : d) + "\n端侧翻译：" + (m == null ? "—" : m)));
+    }).start();
+    ui.postDelayed(pendingTry, 250);
   }
 
   void refreshGlossaryStatus() {

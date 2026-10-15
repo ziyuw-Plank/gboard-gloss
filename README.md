@@ -4,7 +4,15 @@
 
 在谷歌输入法（Gboard）的候选词旁叠加显示目标语言译词，打字时顺便学外语。灵感来自 [青简 Qingjian](https://github.com/qingjian-team/qingjian)。
 
-> **状态：** v0.4.0 — 短语与句子译文大幅改进（离线分词 + 语法组合），附离线评测工具。升级后强停 Gboard。
+> **状态：** v0.5.0 — 混合翻译：单词用离线词典，短语用端侧神经网络翻译（ML Kit NMT），译文有语法。升级后强停 Gboard。
+
+### v0.5.0
+- 短语改用端侧神经网络机器翻译（Google ML Kit NMT），整句翻译，语序和语法自然；单词仍走离线词典
+- 翻译在模块自身进程内完成，Gboard 通过轻量 IPC 异步获取，不阻塞绘制
+- 省电：停止输入约 150 ms 后才翻译，只翻前几个候选；内存 + 磁盘缓存，重复短语不再计算
+- 设置页可下载语言模型（可选仅 Wi‑Fi）、查看模型状态，并提供试译输入框；下载后完全离线
+- 词典兜底译文加入基础语法修正，NMT 未就绪时也更通顺
+- Android 11+ 包可见性适配（可选勾选“系统框架”作用域）
 
 ### v0.4.0
 - 离线短语引擎：按词频分词，组合出符合英语语序的短语译文；处理否定、代词、语气词、量词与疑问句
@@ -31,12 +39,29 @@
 - 可选在线补全（默认关）：离线未命中时异步请求并缓存，不阻塞绘制
 - 性能：查词与绘制仍走缓存路径，在线请求限流
 
+## 混合翻译原理
+只靠词典逐词拼接，得到的只是单词堆叠，没有语法和语序。v0.5.0 起采用混合方案：
+
+| 候选类型 | 处理方式 | 特点 |
+|---|---|---|
+| 单词 / 词表词条 | 离线词典（CC-CEDICT、JMdict、FreeDict）+ 领域词表 | 同步、亚毫秒、精确 |
+| 短语 / 句子 | 端侧神经网络机器翻译（ML Kit NMT） | 整句理解，语法正确 |
+
+- **离线**：每种语言模型约 30 MB，下载一次后无需联网
+- **隐私**：翻译在本机完成，输入内容不上传
+- **省电**：异步 + 防抖（约 150 ms）+ 只翻前 3 个候选 + LRU/磁盘缓存；绘制路径只读缓存
+- **兜底**：NMT 结果到达前先显示词典译文（带语法修正），到达后替换
+
+![Hybrid pipeline](docs/hybrid-pipeline.svg)
+
+**Android 11+ 可见性：** Gboard 需要能“看见”本模块的 ContentProvider。打开 GboardGloss 并在“试一试”输入框中用 Gboard 打几个字即可（系统会让输入法看见当前应用，重启后需再做一次）；或在 LSPosed 作用域中额外勾选“系统框架”并重启，永久生效（只对 Gboard 放行本模块）。
+
 ## 功能
 - 仅作用于 Gboard（`com.google.android.inputmethod.latin`）的 LSPosed 模块
 - 候选词下方叠加一行译词，只做绘制叠加，**不改变** Gboard 的选词、上屏和其他行为
 - 自动识别源语言（按文字类型）
 - 目标语言：英、中、日、德、法、西、俄；无直接词典时经英语中转
-- 离线词典 + 领域词表；可选在线补全（默认关）
+- 单词：离线词典 + 领域词表；短语：端侧神经网络翻译（ML Kit）；可选在线补全（默认关）
 - Material You 控制中心：动态取色、深浅色、开关、语言、字号、词表导入
 - 注入成功提示：屏幕底部胶囊条，几秒后淡出
 - 调试模式，日志带 `[gloss]` 前缀
@@ -50,6 +75,7 @@
 ## 概念图
 | 图 | 说明 |
 |---|---|
+| [混合翻译](docs/hybrid-pipeline.svg) | 候选词 → 词典（单词）/ 端侧 NMT（短语）→ 缓存 → 译词叠加 |
 | [架构](docs/architecture.svg) | LSPosed / Vector 注入 → Hook SoftKeyView → 候选栏叠加译词 |
 | [查词流程](docs/lookup-flow.svg) | 领域词表 → 离线词典 → 可选在线补全（默认关） |
 | [控制中心](docs/control-center.svg) | Material You 设置：开关、语言、字号、词表、在线、调试 |
@@ -66,7 +92,7 @@
 > 模块仓库的 **GitHub Description** 需在网页上手动设为 `GboardGloss`（API 无权限），否则可能不在列表显示。
 
 ## 安装与使用
-1. 从 [Releases](https://github.com/ziyuw-Plank/gboard-gloss/releases) 下载 `GboardGloss-0.4.0.apk` 并安装
+1. 从 [Releases](https://github.com/ziyuw-Plank/gboard-gloss/releases) 下载 `GboardGloss-0.5.0.apk` 并安装
 2. LSPosed 中启用模块，作用域勾选 Gboard（同时勾选模块本身，设置页才能显示状态）
 3. 强行停止 Gboard
 4. 打开 GboardGloss，选择目标语言；需要时可导入领域词表或打开在线补全
@@ -149,7 +175,32 @@ python3 tools/build_dicts.py   # 可选：重新生成词典
 
 GboardGloss shows a translation under each Gboard suggestion so you pick up vocabulary while you type. Inspired by [Qingjian 青简](https://github.com/qingjian-team/qingjian).
 
-> **Status:** v0.4.0 — much better phrase and sentence glosses (offline segmentation + grammatical composition), with an offline evaluation harness. Force-stop Gboard after upgrading.
+> **Status:** v0.5.0 — hybrid translation: offline dictionary for words, on-device neural machine translation (ML Kit NMT) for phrases, so phrase glosses are grammatical. Force-stop Gboard after upgrading.
+
+### v0.5.0
+- Phrases now use on-device neural machine translation (Google ML Kit NMT): whole-phrase translation with natural word order and grammar; single words still use the offline dictionary
+- Translation runs in the module's own process; Gboard fetches it asynchronously over lightweight IPC and never blocks drawing
+- Battery: translates only after ~150 ms of no typing and only the leading candidates; memory + disk cache for repeats
+- Settings: download language models (optional Wi‑Fi only), model status, and a try-it box; fully offline after download
+- Basic grammar fixes for the dictionary fallback, so it reads better before NMT is ready
+- Android 11+ package-visibility handling (optional "System Framework" scope)
+
+### Hybrid translation
+Stitching dictionary words together gives a pile of words, not a sentence: no grammar, no word order. Since v0.5.0:
+
+| Candidate | Engine | Notes |
+|---|---|---|
+| Word / glossary term | Offline dictionary + domain glossary | Synchronous, sub-millisecond, exact |
+| Phrase / sentence | On-device NMT (ML Kit) | Understands the whole phrase, grammatical |
+
+- **Offline**: ~30 MB per language model, downloaded once
+- **Private**: translation happens on the device; nothing you type is uploaded
+- **Battery-friendly**: async + ~150 ms debounce + top-3 candidates only + LRU/disk cache; the draw path only reads cache
+- **Fallback**: grammar-fixed dictionary gloss shows first, replaced when NMT returns
+
+![Hybrid pipeline](docs/hybrid-pipeline.svg)
+
+**Android 11+ visibility:** Gboard must be able to see the module's ContentProvider. Open GboardGloss and type a few characters with Gboard in the "try it" box (the system lets the IME see the app it is typing into; repeat after reboot), or additionally tick "System Framework" in the LSPosed scope and reboot for a permanent fix (it only unhides this module from Gboard).
 
 ### v0.4.0
 - Offline phrase engine: frequency-weighted segmentation, composed into English word order; handles negation, pronouns, particles, measure words and questions
@@ -164,7 +215,7 @@ GboardGloss shows a translation under each Gboard suggestion so you pick up voca
 - Translation gloss drawn under candidates; purely additive, **never changes** Gboard behavior
 - Automatic source language detection (by script)
 - Targets: en, zh, ja, de, fr, es, ru, with English as pivot when needed
-- Offline dictionaries + domain glossary; optional online fill-in (default off)
+- Words: offline dictionaries + domain glossary; phrases: on-device NMT (ML Kit); optional online fill-in (default off)
 - Material You control center: dynamic color, toggles, language, size, glossary import
 - Injection banner that fades out
 - Debug mode with `[gloss]`-tagged logs
@@ -178,6 +229,7 @@ GboardGloss shows a translation under each Gboard suggestion so you pick up voca
 ### Concept diagrams
 | Diagram | What it shows |
 |---|---|
+| [Hybrid pipeline](docs/hybrid-pipeline.svg) | candidate → dictionary (word) / on-device NMT (phrase) → cache → gloss overlay |
 | [Architecture](docs/architecture.svg) | LSPosed / Vector inject → SoftKeyView hook → gloss overlay |
 | [Lookup flow](docs/lookup-flow.svg) | Glossary → offline dicts → optional online (default off) |
 | [Control center](docs/control-center.svg) | Material You settings: enable, language, size, glossary, online, debug |
@@ -194,7 +246,7 @@ Listed: [modules.lsposed.org page](https://modules.lsposed.org/module/io.github.
 > Set the modules-repo GitHub **Description** to `GboardGloss` in the browser (API lacks permission) or it may stay hidden.
 
 ### Install & use
-1. Download `GboardGloss-0.4.0.apk` from [Releases](https://github.com/ziyuw-Plank/gboard-gloss/releases) and install it
+1. Download `GboardGloss-0.5.0.apk` from [Releases](https://github.com/ziyuw-Plank/gboard-gloss/releases) and install it
 2. Enable the module in LSPosed and tick Gboard (tick the module itself too for settings status)
 3. Force-stop Gboard
 4. Open GboardGloss, pick a target language; optionally import a glossary or enable online fill-in
@@ -220,14 +272,14 @@ JDK 17 + Android SDK, then `./gradlew assembleRelease`.
 ### FAQ
 **Does it affect normal typing?** No. It only draws extra text on candidate views.
 
-**Does it need internet?** Not by default. Online fill-in only runs on offline misses when you turn it on.
+**Does it need internet?** Only once, to download translation models (~30 MB each). After that everything runs on-device. The separate online fill-in stays off unless you turn it on.
 
 **Does it work without root?** No. It needs root and LSPosed.
 
 **Which languages?** Chinese, English, Japanese, German, French, Spanish, Russian (some pairs via English).
 
 ### Credits & license
-Dictionaries: CC-CEDICT, JMdict/EDRDG, FreeDict — see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Optional online: MyMemory. Code licensed [GPL-3.0-or-later](LICENSE). Not affiliated with Google; Gboard is a trademark of Google LLC.
+Dictionaries: CC-CEDICT, JMdict/EDRDG, FreeDict — see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). On-device NMT: Google ML Kit Translation (subject to the ML Kit terms). Optional online: MyMemory. Code licensed [GPL-3.0-or-later](LICENSE). Not affiliated with Google; Gboard is a trademark of Google LLC.
 
 ## Keywords
-Gboard, Gboard translation, Gboard 翻译, 谷歌输入法, 谷歌输入法翻译, LSPosed, LSPosed module, Xposed module, Xposed 模块, 输入法翻译, 候选词翻译, bilingual candidates, 双语候选词, 外语学习, language learning keyboard, vocabulary learning, domain glossary, 领域词表, Android, root, Magisk, Zygisk, offline dictionary, 离线词典, CC-CEDICT, JMdict, FreeDict, jieba, Chinese word segmentation, 中文分词, phrase translation, 短语翻译, Qingjian, 青简, Material You, online translation, 在线翻译, Vector, modules.lsposed.org, io.github.ziyuw_plank.gboardgloss, SoftKeyView, concept diagram
+Gboard, Gboard translation, Gboard 翻译, 谷歌输入法, 谷歌输入法翻译, LSPosed, LSPosed module, Xposed module, Xposed 模块, 输入法翻译, 候选词翻译, bilingual candidates, 双语候选词, 外语学习, language learning keyboard, vocabulary learning, domain glossary, 领域词表, Android, root, Magisk, Zygisk, offline dictionary, 离线词典, CC-CEDICT, JMdict, FreeDict, jieba, Chinese word segmentation, 中文分词, phrase translation, 短语翻译, Qingjian, 青简, Material You, online translation, 在线翻译, Vector, modules.lsposed.org, io.github.ziyuw_plank.gboardgloss, SoftKeyView, concept diagram, neural machine translation, NMT, on-device translation, offline translation, ML Kit, ML Kit Translation, Google ML Kit, hybrid translation, grammar-aware translation, sentence translation, 神经网络翻译, 神经机器翻译, 端侧翻译, 离线翻译, 本地翻译, 混合翻译, 整句翻译, 隐私翻译

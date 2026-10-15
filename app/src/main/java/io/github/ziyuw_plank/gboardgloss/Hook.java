@@ -84,6 +84,7 @@ public class Hook implements IXposedHookLoadPackage, IXposedHookZygoteInit {
       } catch (Throwable t) { log("self hook " + t); }
       return;
     }
+    if (lp.packageName.equals("android")) { SysVisibility.install(lp.classLoader); return; }
     if (!lp.packageName.equals(GBOARD) || !lp.isFirstApplication) return;
 
     log("loaded in " + lp.processName + " module=" + modulePath);
@@ -359,6 +360,15 @@ public class Hook implements IXposedHookLoadPackage, IXposedHookZygoteInit {
     String gloss = Dictionary.translate(OPENER, word, lang);
     gloss = Dictionary.fitGlossToken(gloss, 22);
     v.setTag(R.id.gloss_text, gloss);
+
+    String src0 = Dictionary.detectPrimary(word);
+    boolean phrase = word.length() >= 2 && (Dictionary.wasComposed(word, lang) || gloss == null)
+        && (word.indexOf(' ') > 0 || (src0 != null && Dictionary.isCjkKey(src0) && word.length() >= 3) || Dictionary.wasComposed(word, lang));
+    if (phrase && src0 != null && !src0.equals(lang) && prefs.getBoolean(Prefs.MT, true)) {
+      String hit = MtClient.peek(word, lang);
+      if (hit != null) { v.setTag(R.id.gloss_text, Dictionary.fitGlossToken(hit, 40)); gloss = hit; }
+      else MtClient.request(v.getContext(), v, word, src0, lang);
+    }
 
     if (gloss == null && prefs.getBoolean(Prefs.ONLINE, false)) {
       String src = Dictionary.detectPrimary(word);
