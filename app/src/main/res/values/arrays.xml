@@ -1,0 +1,3 @@
+<resources><string-array name="scope"><item>com.google.android.inputmethod.latin</item></string-array>
+<string-array name="langs"><item>English (en)</item><item>日本語 (ja)</item><item>한국어 (ko)</item><item>Français (fr)</item><item>Deutsch (de)</item><item>Español (es)</item></string-array>
+<string-array name="lang_codes"><item>en</item><item>ja</item><item>ko</item><item>fr</item><item>de</item><item>es</item></string-array></resources>

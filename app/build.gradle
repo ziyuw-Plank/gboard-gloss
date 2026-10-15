@@ -1,0 +1,11 @@
+plugins { id 'com.android.application' }
+android {
+  namespace 'com.zyw.gloss'; compileSdk 34
+  defaultConfig { applicationId 'com.zyw.gloss'; minSdk 27; targetSdk 34; versionCode 1; versionName '0.1' }
+  compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+  buildTypes { release { minifyEnabled false; signingConfig signingConfigs.debug } }
+}
+dependencies {
+  compileOnly 'de.robv.android.xposed:api:82'
+  implementation 'com.google.android.material:material:1.12.0'
+}
