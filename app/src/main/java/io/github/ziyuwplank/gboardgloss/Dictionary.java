@@ -1,4 +1,4 @@
-package com.zyw.gloss;
+package io.github.ziyuwplank.gboardgloss;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;

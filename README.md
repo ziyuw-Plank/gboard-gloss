@@ -4,7 +4,12 @@
 
 在谷歌输入法（Gboard）的候选词旁叠加显示目标语言译词，打字时顺便学外语。灵感来自 [青简 Qingjian](https://github.com/qingjian-team/qingjian)。
 
-> **状态：** v0.3.0 — 精确匹配优先、领域词表、柔和 Material 样式；可选在线补全（默认关）。请更新 APK 后强停 Gboard 再测。
+> **状态：** v0.3.1 — 包名改为 `io.github.ziyuwplank.gboardgloss`（满足 LSPosed 模块仓库审核）；概念图已加入 README。请卸载旧包 `com.zyw.gloss` 后安装，并强停 Gboard。
+
+### v0.3.1
+- 包名改为 `io.github.ziyuwplank.gboardgloss`，以便提交 [LSPosed / Vector 共用模块仓库](https://modules.lsposed.org)
+- README 增加架构 / 查词 / 控制中心概念图（`docs/*.svg`）
+- 需卸载旧包 `com.zyw.gloss` 后重装
 
 ### v0.3.0
 - 译词质量：仅展示可信的整词/词表命中；不再用劣质切分拼出译文
@@ -29,8 +34,25 @@
 - Root（Magisk）+ LSPosed（Zygisk）
 - Gboard（对照分析版本 18.4.1）
 
+
+## 概念图
+| 图 | 说明 |
+|---|---|
+| [架构](docs/architecture.svg) | LSPosed / Vector 注入 → Hook SoftKeyView → 候选栏叠加译词 |
+| [查词流程](docs/lookup-flow.svg) | 领域词表 → 离线词典 → 可选在线补全（默认关） |
+| [控制中心](docs/control-center.svg) | Material You 设置：开关、语言、字号、词表、在线、调试 |
+
+![Architecture](docs/architecture.svg)
+
+![Lookup flow](docs/lookup-flow.svg)
+
+![Control center](docs/control-center.svg)
+
+## 模块仓库（LSPosed / Vector）
+本模块通过 [Xposed Module Repository](https://modules.lsposed.org) 分发；**Vector** 与 LSPosed 管理器共用该远程模块列表，无需单独上架。包名：`io.github.ziyuwplank.gboardgloss`。
+
 ## 安装与使用
-1. 从 [Releases](https://github.com/ziyuw-Plank/gboard-gloss/releases) 下载 `GboardGloss-0.3.0.apk` 并安装
+1. 从 [Releases](https://github.com/ziyuw-Plank/gboard-gloss/releases) 下载 `GboardGloss-0.3.1.apk` 并安装
 2. LSPosed 中启用模块，作用域勾选 Gboard（同时勾选模块本身，设置页才能显示状态）
 3. 强行停止 Gboard
 4. 打开 GboardGloss，选择目标语言；需要时可导入领域词表或打开在线补全
@@ -93,6 +115,11 @@ python3 tools/build_dicts.py   # 可选：重新生成词典
 <a id="english"></a>
 ## English
 
+### v0.3.1
+- Package id → `io.github.ziyuwplank.gboardgloss` for [Xposed Module Repository](https://modules.lsposed.org) (LSPosed & Vector)
+- Concept diagrams added under `docs/`
+- Uninstall legacy `com.zyw.gloss` before installing
+
 ### v0.3.0
 - Gloss quality: show only trusted whole-entry / glossary hits; no poor segmentation stitches
 - Built-in domain glossary plus Settings import for custom TSV; exact matches beat the general dictionaries
@@ -103,7 +130,7 @@ python3 tools/build_dicts.py   # 可选：重新生成词典
 
 GboardGloss shows a translation under each Gboard suggestion so you pick up vocabulary while you type. Inspired by [Qingjian 青简](https://github.com/qingjian-team/qingjian).
 
-> **Status:** v0.3.0 — exact-match-first, domain glossary, softer Material look; optional online fill-in (default off). Force-stop Gboard after updating.
+> **Status:** v0.3.1 — package id `io.github.ziyuwplank.gboardgloss` for module-repo listing; concept diagrams in README. Uninstall legacy `com.zyw.gloss`, then force-stop Gboard.
 
 ### Features
 - LSPosed module scoped to Gboard only (`com.google.android.inputmethod.latin`)
@@ -120,8 +147,25 @@ GboardGloss shows a translation under each Gboard suggestion so you pick up voca
 - Root (Magisk) + LSPosed (Zygisk)
 - Gboard (analyzed against 18.4.1)
 
+
+### Concept diagrams
+| Diagram | What it shows |
+|---|---|
+| [Architecture](docs/architecture.svg) | LSPosed / Vector inject → SoftKeyView hook → gloss overlay |
+| [Lookup flow](docs/lookup-flow.svg) | Glossary → offline dicts → optional online (default off) |
+| [Control center](docs/control-center.svg) | Material You settings: enable, language, size, glossary, online, debug |
+
+![Architecture](docs/architecture.svg)
+
+![Lookup flow](docs/lookup-flow.svg)
+
+![Control center](docs/control-center.svg)
+
+### Module repository (LSPosed / Vector)
+Listed via the [Xposed Module Repository](https://modules.lsposed.org). **Vector** and LSPosed managers share that remote list — no separate Vector store. Package: `io.github.ziyuwplank.gboardgloss`.
+
 ### Install & use
-1. Download `GboardGloss-0.3.0.apk` from [Releases](https://github.com/ziyuw-Plank/gboard-gloss/releases) and install it
+1. Download `GboardGloss-0.3.1.apk` from [Releases](https://github.com/ziyuw-Plank/gboard-gloss/releases) and install it
 2. Enable the module in LSPosed and tick Gboard (tick the module itself too for settings status)
 3. Force-stop Gboard
 4. Open GboardGloss, pick a target language; optionally import a glossary or enable online fill-in
@@ -157,4 +201,4 @@ JDK 17 + Android SDK, then `./gradlew assembleRelease`.
 Dictionaries: CC-CEDICT, JMdict/EDRDG, FreeDict — see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Optional online: MyMemory. Code licensed [GPL-3.0-or-later](LICENSE). Not affiliated with Google; Gboard is a trademark of Google LLC.
 
 ## Keywords
-Gboard, Gboard translation, Gboard 翻译, 谷歌输入法, 谷歌输入法翻译, LSPosed, LSPosed module, Xposed module, Xposed 模块, 输入法翻译, 候选词翻译, bilingual candidates, 双语候选词, 外语学习, language learning keyboard, vocabulary learning, domain glossary, 领域词表, Android, root, Magisk, Zygisk, offline dictionary, 离线词典, CC-CEDICT, JMdict, FreeDict, Qingjian, 青简, Material You, online translation, 在线翻译
+Gboard, Gboard translation, Gboard 翻译, 谷歌输入法, 谷歌输入法翻译, LSPosed, LSPosed module, Xposed module, Xposed 模块, 输入法翻译, 候选词翻译, bilingual candidates, 双语候选词, 外语学习, language learning keyboard, vocabulary learning, domain glossary, 领域词表, Android, root, Magisk, Zygisk, offline dictionary, 离线词典, CC-CEDICT, JMdict, FreeDict, Qingjian, 青简, Material You, online translation, 在线翻译, Vector, modules.lsposed.org, io.github.ziyuwplank.gboardgloss, SoftKeyView, concept diagram

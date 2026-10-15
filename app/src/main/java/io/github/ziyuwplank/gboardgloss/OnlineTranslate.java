@@ -1,4 +1,4 @@
-package com.zyw.gloss;
+package io.github.ziyuwplank.gboardgloss;
 
 import android.os.Handler;
 import android.os.HandlerThread;

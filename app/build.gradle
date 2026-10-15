@@ -1,7 +1,7 @@
 plugins { id 'com.android.application' }
 android {
-  namespace 'com.zyw.gloss'; compileSdk 34
-  defaultConfig { applicationId 'com.zyw.gloss'; minSdk 27; targetSdk 34; versionCode 5; versionName "0.3.0" }
+  namespace 'io.github.ziyuwplank.gboardgloss'; compileSdk 34
+  defaultConfig { applicationId 'io.github.ziyuwplank.gboardgloss'; minSdk 27; targetSdk 34; versionCode 6; versionName "0.3.1" }
   compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
   buildTypes { release { minifyEnabled false; signingConfig signingConfigs.debug } }
 }

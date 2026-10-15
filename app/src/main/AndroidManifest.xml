@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <uses-permission android:name="android.permission.INTERNET"/>
   <application android:label="Gboard 译词" android:theme="@style/AppTheme" android:icon="@mipmap/ic_launcher">
     <meta-data android:name="xposedmodule" android:value="true"/>
     <meta-data android:name="xposeddescription" android:value="在 Gboard 候选词旁显示目标语言译词（仅叠加显示）"/>
