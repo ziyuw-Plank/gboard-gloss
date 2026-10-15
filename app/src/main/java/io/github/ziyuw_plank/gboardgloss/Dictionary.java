@@ -127,7 +127,22 @@ public final class Dictionary {
     return n;
   }
 
+  /** Value without trailing cost column. */
   static String find(D d, String key) {
+    String v = findRaw(d, key);
+    if (v == null) return null;
+    int t = v.lastIndexOf('\t');
+    return t >= 0 ? v.substring(0, t) : v;
+  }
+
+  /** Segmentation cost from the third column (lower = more frequent); -1 if absent. */
+  static int costOf(String raw) {
+    int t = raw.lastIndexOf('\t');
+    if (t < 0) return -1;
+    try { return Integer.parseInt(raw.substring(t + 1).trim()); } catch (Exception e) { return -1; }
+  }
+
+  static String findRaw(D d, String key) {
     byte[] k = key.getBytes(StandardCharsets.UTF_8);
     int lo = 0, hi = d.n - 1;
     while (lo <= hi) {
@@ -239,34 +254,287 @@ public final class Dictionary {
     return 30;
   }
 
-  /**
-   * High-quality display match only. No longest-prefix, no garbage bipartite stitches.
-   */
-  static String findFlex(D d, String key, boolean cjk) {
-    String r = find(d, key);
-    if (r != null) {
-      String c = cleanGloss(r);
-      if (c != null) return c;
-    }
-    if (!cjk) return null;
-    if (key.length() <= 1) return null;
+  // ---- v0.4 phrase engine: whole-entry → potential complement → DP segmentation + composition ----
 
-    r = findNegation(d, key);
-    if (r != null) return r;
+  /** Sentence particles / aspect markers: dropped when composing a phrase gloss. */
+  private static final String PARTICLES = "的了吗呢吧啊呀哦嘛啦么着过哈呗噢喔哇嗯";
+  /** Closed-class words with a fixed short gloss (used only inside multi-segment phrases). */
+  private static final HashMap<String, String> FUNC = new HashMap<>();
+  static {
+    String[] f = {
+        "我","I", "你","you", "您","you", "他","he", "她","she", "它","it", "我们","we", "咱们","we",
+        "你们","you", "他们","they", "她们","they", "大家","everyone", "自己","oneself",
+        "很","very", "太","too", "也","also", "都","all", "还","still", "就","just", "又","again",
+        "再","again", "真","really", "最","most", "更","more", "非常","very", "已经","already",
+        "在","at", "是","is", "有","have", "要","want", "想","want", "会","can", "能","can",
+        "可以","can", "这","this", "那","that", "这个","this", "那个","that", "一下","", "一点","a bit",
+        "和","and", "跟","with", "给","for", "把","", "被","by", "对","right", "好","good",
+        "去","go", "来","come", "到","arrive", "点","o'clock", "见","see", "走","go",
+        "哪","where", "哪里","where", "哪儿","where", "什么","what", "谁","who", "怎么","how",
+        "为什么","why", "多少","how many", "几","how many", "不错","not bad",
+        "不会","can't", "不能","can't", "不要","don't", "不用","no need to", "不想","don't want",
+        "没有","have no", "不是","isn't", "叫","be called", "个","", "本","", "张","", "件","", "条","", "位","", "种","", "杯","", "瓶","", "辆","", "双","", "台","",
+    };
+    for (int i = 0; i < f.length; i += 2) FUNC.put(f[i], f[i + 1]);
+  }
+  static boolean DEBUG = false;
+  private static final Set<String> OBJ = new HashSet<>(Arrays.asList("me", "you", "him", "her", "us", "them"));
+  private static final HashMap<String, String> BE = new HashMap<>();
+  private static final HashMap<String, String> POSS = new HashMap<>();
+  private static final Set<String> FUNC_VERBS = new HashSet<>(Arrays.asList(
+      "去", "来", "走", "到", "见", "想", "要", "会", "能", "叫", "有", "是", "在"));
+  private static final HashMap<String, String> INV = new HashMap<>();
+  static {
+    String[] v = {"I","am I", "you","are you", "he","is he", "she","is she", "it","is it", "we","are we", "they","are they"};
+    for (int i = 0; i < v.length; i += 2) INV.put(v[i], v[i + 1]);
+  }
+  static {
+    String[] p = {"我","my", "你","your", "您","your", "他","his", "她","her", "它","its",
+        "我们","our", "咱们","our", "你们","your", "他们","their", "她们","their"};
+    for (int i = 0; i < p.length; i += 2) POSS.put(p[i], p[i + 1]);
+  }
+  static {
+    BE.put("I", "I'm"); BE.put("you", "you're"); BE.put("he", "he's"); BE.put("she", "she's");
+    BE.put("it", "it's"); BE.put("we", "we're"); BE.put("they", "they're");
+  }
+  private static final String NEG = "不没别";
+  private static final Set<String> SUBJ = new HashSet<>(Arrays.asList(
+      "I", "you", "he", "she", "it", "we", "they", "everyone", "can", "want", "also", "already", "still", "just"));
+  /** Resultative complements for X不Y when XY itself is not an entry. */
+  private static final HashMap<Character, String> COMPL = new HashMap<>();
+  static {
+    COMPL.put('懂', "understand"); COMPL.put('见', "see"); COMPL.put('完', "finish");
+    COMPL.put('清', "make out"); COMPL.put('起', "afford"); COMPL.put('动', "move");
+  }
 
-    String stripped = stripLeadingPronoun(key);
-    if (stripped != null && stripped.length() >= 2) {
-      r = find(d, stripped);
-      if (r != null) {
-        String c = cleanGloss(r);
-        if (c != null) return c;
+  /** Short display gloss of one dictionary value: first sense, maybe a short second. */
+  static String displayGloss(String v, boolean allowSecond) {
+    if (v == null) return null;
+    String[] ss = v.split("; ");
+    String a = stripTo(ss[0]);
+    if (a == null) return null;
+    if (a.length() > 20 && ss.length > 1 && isIdiomLike(ss)) { // long literal explanation: prefer the shortest reasonable sense
+      for (int i = 1; i < ss.length && i < 4; i++) {
+        String c = stripTo(ss[i]);
+        if (c != null && c.length() >= 4 && c.length() < a.length()) a = c;
       }
-      r = findNegation(d, stripped);
-      if (r != null) return r;
     }
+    if (allowSecond && ss.length > 1 && a.length() <= 10) {
+      String b = stripTo(ss[1]);
+      if (b != null && !b.equalsIgnoreCase(a) && a.length() + b.length() + 2 <= 22) a = a + "; " + b;
+    }
+    return fitGlossToken(a, 24);
+  }
 
-    // Deliberately no longest-prefix / segment fallback — prefer empty over garbage.
+  /** Idiom entries: several long descriptive senses (no infinitive head). */
+  static boolean isIdiomLike(String[] ss) {
+    return !ss[0].startsWith("to ") || ss[0].split(" ").length > 5;
+  }
+
+  static String stripTo(String g) {
+    if (g == null) return null;
+    int slash = g.indexOf('/');
+    if (slash >= 0) g = g.substring(0, slash);
+    g = g.replaceAll("\\s*\\([^)]*\\)", "").trim();
+    if (g.regionMatches(true, 0, "to ", 0, 3)) g = g.substring(3).trim();
+    return g.isEmpty() ? null : g;
+  }
+
+  /** Short single-sense gloss used as a phrase segment (no "; "). */
+  static String segGloss(D d, String w) { return segGloss(d, w, false); }
+
+  static String segGloss(D d, String w, boolean preferVerb) {
+    String f = FUNC.get(w);
+    if (f != null) return f;
+    String v = find(d, w);
+    if (v == null) return null;
+    String[] ss = v.split("; ");
+    String pick = ss[0];
+    if (preferVerb && !pick.startsWith("to ")) {
+      for (String x : ss) if (x.startsWith("to ")) { pick = x; break; }
+    }
+    String g = shortSense(pick);
+    if (g != null && g.length() <= 16) return g;
+    for (String x : ss) { // first sense too long: take the next reasonably short one
+      String c = shortSense(x);
+      if (c != null && c.length() <= 16) return c;
+    }
+    return g != null && g.length() <= 22 ? g : null;
+  }
+
+  static String shortSense(String x) {
+    String g = stripTo(x);
+    if (g == null) return null;
+    int comma = g.indexOf(", ");
+    if (comma > 0) g = g.substring(0, comma);
+    return g;
+  }
+
+  static boolean isParticle(String w) { return w.length() == 1 && PARTICLES.indexOf(w.charAt(0)) >= 0; }
+
+  /** "not X" with light grammar: not+be/have handled, "not not" avoided. */
+  static String negate(String g, char neg) {
+    if (g == null || g.isEmpty()) return null;
+    String lg = g.toLowerCase(Locale.ROOT);
+    if (lg.startsWith("not ") || lg.startsWith("no ") || lg.startsWith("un") && false) return g;
+    if (neg == '别') return "don't " + g;
+    if (lg.startsWith("be ") && neg != '没') return "not " + g.substring(3);
+    if (neg == '没') {
+      if (lg.equals("have")) return "not have";
+      if (lg.equals("time") || lg.equals("money") || lg.equals("problem") || lg.equals("way")
+          || lg.equals("matter") || lg.equals("meaning") || lg.equals("method")) return "no " + g;
+      return "not " + g;
+    }
+    return "not " + g;
+  }
+
+  /** Whole-entry match (incl. negation of a whole entry). */
+  static String findWhole(D d, String key, boolean cjk) {
+    String r = find(d, key);
+    if (r != null) return displayGloss(r, true);
+    if (!cjk || key.length() < 2) return null;
+    char c0 = key.charAt(0);
+    if (NEG.indexOf(c0) >= 0 && key.length() >= 2) {
+      String rest = key.substring(1);
+      String base = find(d, rest);
+      if (base != null) return negate(segGloss(d, rest, true), c0);
+    }
     return null;
+  }
+
+  /** X不Y potential complement (看不懂, 找不到): "can't " + gloss(XY). */
+  static String potential(D d, String key) {
+    int i = key.indexOf('不');
+    if (key.length() != 3 || i != 1) return null;
+    String xy = "" + key.charAt(0) + key.charAt(2);
+    String v = find(d, xy);
+    if (v == null) {
+      String c = COMPL.get(key.charAt(2));
+      return c == null || find(d, key.substring(0, 1)) == null ? null : "can't " + c;
+    }
+    String g = stripTo(v.split("; ")[0]);
+    if (g == null || g.length() > 18) return null;
+    return "can't " + g;
+  }
+
+  /** DP segmentation (min frequency cost) then grammatical composition; null if not confident. */
+  static String segmentCompose(D d, String key) {
+    int n = key.length();
+    if (n < 2 || n > 12) return null;
+    final int INF = Integer.MAX_VALUE / 4, SEG = 40;
+    int[] best = new int[n + 1];
+    int[] back = new int[n + 1];
+    Arrays.fill(best, INF);
+    best[0] = 0;
+    for (int i = 0; i < n; i++) {
+      if (best[i] >= INF) continue;
+      for (int j = Math.min(n, i + 8); j > i; j--) {
+        if (i == 0 && j == n) continue; // whole key already tried
+        String w = key.substring(i, j);
+        int c;
+        if (isParticle(w)) c = 15;
+        else {
+          String raw = findRaw(d, w);
+          String gl = glossary.get(w);
+          if (raw == null && gl == null && !FUNC.containsKey(w)) continue;
+          int fc = raw == null ? 60 : costOf(raw);
+          if (fc < 0) fc = 120;
+          c = fc + SEG + (w.length() == 1 && !FUNC.containsKey(w) ? 40 : 0);
+        }
+        if (best[i] + c < best[j]) { best[j] = best[i] + c; back[j] = i; }
+      }
+    }
+    if (best[n] >= INF) return null;
+    ArrayList<String> segs = new ArrayList<>();
+    for (int j = n; j > 0; j = back[j]) segs.add(0, key.substring(back[j], j));
+
+    if (DEBUG) System.err.println("segs " + segs);
+    ArrayList<String> out = new ArrayList<>();
+    int content = 0, weakSingles = 0;
+    char pendingNeg = 0;
+    for (int k = 0; k < segs.size(); k++) {
+      String w = segs.get(k);
+      if (isParticle(w)) continue;
+      if (w.length() == 1 && NEG.indexOf(w.charAt(0)) >= 0) { pendingNeg = w.charAt(0); continue; }
+      String prev = out.isEmpty() ? "" : out.get(out.size() - 1);
+      String next = k + 1 < segs.size() ? segs.get(k + 1) : "";
+      boolean nextIsVerb = false;
+      if (!next.isEmpty() && !isParticle(next) && !FUNC.containsKey(next)) {
+        String nv = find(d, next);
+        nextIsVerb = nv != null && nv.startsWith("to ");
+      }
+      if (FUNC_VERBS.contains(next)) nextIsVerb = true;
+      if (w.equals("很") && (next.equals("想") || nextIsVerb)) { out.add("really"); continue; }
+      // X不X / X没X question form inside a phrase → just X
+      if (w.length() == 3 && w.charAt(0) == w.charAt(2) && (w.charAt(1) == '不' || w.charAt(1) == '没'))
+        w = w.substring(0, 1);
+      if (w.equals("在") && nextIsVerb) continue;
+      if (w.equals("想") && pendingNeg == '没') { out.add("didn't think"); pendingNeg = 0; continue; }          // progressive 在 + V
+      if (w.equals("没有") && nextIsVerb) { pendingNeg = '没'; continue; }
+      if (POSS.containsKey(w) && next.equals("的")) { out.add(POSS.get(w)); continue; }
+      boolean subj = pendingNeg != 0;
+      String g = glossary.get(w);
+      if (g == null) g = segGloss(d, w, subj);
+      if (g == null) return null;
+      if (w.length() == 1 && !FUNC.containsKey(w)) weakSingles++;
+      if (!FUNC.containsKey(w)) content++;
+      if (g.isEmpty()) continue;
+      if (g.endsWith("?")) g = g.substring(0, g.length() - 1).trim();
+      if (!out.isEmpty()) { // object position pronouns
+        if (g.equals("I")) g = "me"; else if (g.equals("he")) g = "him"; else if (g.equals("she")) g = "her";
+        else if (g.equals("we")) g = "us"; else if (g.equals("they")) g = "them";
+        if (prev.equals("want") && OBJ.contains(g)) out.set(out.size() - 1, "miss");
+      }
+      boolean wNext = next.equals("谁") || next.equals("什么") || next.equals("哪") || next.equals("哪里") || next.equals("哪儿");
+      if ((g.equals("is") || g.equals("very")) && pendingNeg == 0 && BE.containsKey(prev) && !wNext) {
+        out.set(out.size() - 1, BE.get(prev));
+        if (g.equals("is")) continue;
+      }
+      if (g.startsWith("be ") && pendingNeg == 0 && BE.containsKey(prev)) {
+        out.set(out.size() - 1, BE.get(prev));
+        g = g.substring(3);
+      }
+      if (!out.isEmpty() && g.startsWith(prev + " ")) out.remove(out.size() - 1); // 去+上班 "go go to work"
+      if (pendingNeg != 0) {
+        boolean isVerb = FUNC_VERBS.contains(w);
+        if (!isVerb) { String wv = find(d, w); isVerb = wv != null && wv.startsWith("to "); }
+        if (pendingNeg == '没' && isVerb && !g.startsWith("not ")) g = "didn't " + g;
+        else g = negate(g, pendingNeg);
+        pendingNeg = 0;
+      }
+      out.add(g);
+    }
+    if (pendingNeg != 0) out.add("not");
+    if (out.isEmpty()) return null;
+    boolean anyFunc = false;
+    for (String w : segs) if (FUNC.containsKey(w) || isParticle(w)) anyFunc = true;
+    if (!anyFunc && content >= 3) return null;                 // opaque compound term: don't stitch
+    if (n == 2 && weakSingles == 2) return null;               // two bare characters: too ambiguous
+    if (content == 0 && out.size() > 4) return null;
+    if (content > 4 || weakSingles > 2 || (weakSingles == 2 && content > 3)) return null;
+    if (key.endsWith("吧") && !out.isEmpty() && out.get(0).equals("we")) out.set(0, "let's");
+    // wh-word at the end of a question → front ("you go where" → "where you go")
+    String last = out.get(out.size() - 1);
+    if (out.size() >= 2 && (last.equals("where") || last.equals("what") || last.equals("who"))) {
+      out.remove(out.size() - 1);
+      if (out.size() == 2 && out.get(1).equals("is") && INV.containsKey(out.get(0))) {
+        String subj = out.get(0); out.clear(); out.add(INV.get(subj));
+      }
+      out.add(0, last);
+    }
+    String r = String.join(" ", out).replaceAll("\\s+", " ").trim()
+        .replace("where at", "where").replace("where go", "where to go");
+    if (r.length() > 30) return null;
+    return r;
+  }
+
+  static String findFlex(D d, String key, boolean cjk) {
+    String r = findWhole(d, key, cjk);
+    if (r != null || !cjk) return r;
+    if (key.length() < 2) return null;
+    r = potential(d, key);
+    if (r != null) return r;
+    return segmentCompose(d, key);
   }
 
   public static List<String> detect(String w) {
@@ -340,20 +608,28 @@ public final class Dictionary {
     }
 
     String result = null;
-    for (String s : detect(word)) {
+    List<String> srcs = detect(word);
+    if (srcs.size() == 2 && "zh".equals(srcs.get(0)) && "en".equals(tgt)) {
+      D z = get(o, "zh", "en"), j = get(o, "ja", "en");
+      if (z != null && find(z, word) == null && j != null) {
+        String jw = find(j, word);
+        if (jw != null) { result = displayGloss(jw, false); transCache.put(ck, result); return result; }
+      }
+    }
+    for (String s : srcs) {
       if (s.equals(tgt)) { transCache.put(ck, NONE); return null; }
       String key = isCjkKey(s) ? word : word.toLowerCase(Locale.ROOT);
       boolean cjk = isCjkKey(s);
       D d = get(o, s, tgt);
       if (d != null) {
         String r = findFlex(d, key, cjk);
-        if (r != null && scoreGloss(key, r, r.indexOf('·') >= 0) >= 0) { result = r; break; }
+        if (r != null) { result = r; break; }
         continue;
       }
       D se = get(o, s, "en"), et = get(o, "en", tgt);
       if (se != null) {
         String en = findFlex(se, key, cjk);
-        if (en != null && scoreGloss(key, en, en.indexOf('·') >= 0) >= 0) {
+        if (en != null) {
           if (tgt.equals("en")) { result = en; break; }
           if (et != null) {
             String r = find(et, pivotKey(en));

@@ -6,6 +6,7 @@ GboardGloss 内置的离线词典来自以下项目，生成脚本见 `tools/bui
 | Data / 数据 | Used for / 用途 | License / 许可 | Source / 来源 |
 |---|---|---|---|
 | CC-CEDICT (MDBG) | zh ↔ en | CC BY-SA 4.0 | https://www.mdbg.net/chinese/dictionary?page=cc-cedict |
+| jieba dict.txt (fxsjy/jieba) | zh word frequencies (segmentation cost only) | MIT | https://github.com/fxsjy/jieba |
 | JMdict (Electronic Dictionary Research and Development Group, EDRDG) | ja ↔ en | CC BY-SA 4.0 | https://www.edrdg.org/jmdict/j_jmdict.html — license: https://www.edrdg.org/edrdg/licence.html |
 | FreeDict | de/fr/es/ru ↔ en | GPL (per dictionary; see each FreeDict TEI header) | https://freedict.org/ |
 

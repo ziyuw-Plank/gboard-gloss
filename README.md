@@ -4,7 +4,15 @@
 
 在谷歌输入法（Gboard）的候选词旁叠加显示目标语言译词，打字时顺便学外语。灵感来自 [青简 Qingjian](https://github.com/qingjian-team/qingjian)。
 
-> **状态：** v0.3.2 — 包名 `io.github.ziyuw_plank.gboardgloss`（审核要求下划线）；概念图已加入 README。请卸载旧包后安装，并强停 Gboard。
+> **状态：** v0.4.0 — 短语与句子译文大幅改进（离线分词 + 语法组合），附离线评测工具。升级后强停 Gboard。
+
+### v0.4.0
+- 离线短语引擎：按词频分词，组合出符合英语语序的短语译文；处理否定、代词、语气词、量词与疑问句
+- 词义选择更准：优先常用读音和常用义项，过滤异体、方言、俚语、姓氏等误导义项
+- 英→中、日→中文汉字词的查词更准；繁体同样支持
+- 内置词表扩充：日常聊天用语、常见词的现代义、计算机/AI 与理工术语
+- 不确定时宁可留空；查词更快、内存更省
+- 新增 `tools/eval` 离线评测工具与结果记录（`tools/eval/RESULTS.md`）
 
 ### v0.3.2
 - 包名按审核要求改为 `io.github.ziyuw_plank.gboardgloss`（GitHub 用户名中的连字符改为下划线）
@@ -58,7 +66,7 @@
 > 模块仓库的 **GitHub Description** 需在网页上手动设为 `GboardGloss`（API 无权限），否则可能不在列表显示。
 
 ## 安装与使用
-1. 从 [Releases](https://github.com/ziyuw-Plank/gboard-gloss/releases) 下载 `GboardGloss-0.3.2.apk` 并安装
+1. 从 [Releases](https://github.com/ziyuw-Plank/gboard-gloss/releases) 下载 `GboardGloss-0.4.0.apk` 并安装
 2. LSPosed 中启用模块，作用域勾选 Gboard（同时勾选模块本身，设置页才能显示状态）
 3. 强行停止 Gboard
 4. 打开 GboardGloss，选择目标语言；需要时可导入领域词表或打开在线补全
@@ -141,7 +149,15 @@ python3 tools/build_dicts.py   # 可选：重新生成词典
 
 GboardGloss shows a translation under each Gboard suggestion so you pick up vocabulary while you type. Inspired by [Qingjian 青简](https://github.com/qingjian-team/qingjian).
 
-> **Status:** v0.3.2 — package id `io.github.ziyuw_plank.gboardgloss` (Modules-Repo rules); concept diagrams in README. Uninstall older builds, then force-stop Gboard.
+> **Status:** v0.4.0 — much better phrase and sentence glosses (offline segmentation + grammatical composition), with an offline evaluation harness. Force-stop Gboard after upgrading.
+
+### v0.4.0
+- Offline phrase engine: frequency-weighted segmentation, composed into English word order; handles negation, pronouns, particles, measure words and questions
+- Better sense choice: common reading and common sense first; variant, dialect, slang and surname senses filtered out
+- More accurate en→zh and Japanese kanji lookups; Traditional Chinese supported
+- Larger builtin glossary: everyday chat expressions, modern senses of common words, computing/AI and science terms
+- Shows nothing when unsure; faster lookups, lower memory
+- New `tools/eval` offline harness and results log (`tools/eval/RESULTS.md`)
 
 ### Features
 - LSPosed module scoped to Gboard only (`com.google.android.inputmethod.latin`)
@@ -178,7 +194,7 @@ Listed: [modules.lsposed.org page](https://modules.lsposed.org/module/io.github.
 > Set the modules-repo GitHub **Description** to `GboardGloss` in the browser (API lacks permission) or it may stay hidden.
 
 ### Install & use
-1. Download `GboardGloss-0.3.2.apk` from [Releases](https://github.com/ziyuw-Plank/gboard-gloss/releases) and install it
+1. Download `GboardGloss-0.4.0.apk` from [Releases](https://github.com/ziyuw-Plank/gboard-gloss/releases) and install it
 2. Enable the module in LSPosed and tick Gboard (tick the module itself too for settings status)
 3. Force-stop Gboard
 4. Open GboardGloss, pick a target language; optionally import a glossary or enable online fill-in
@@ -214,4 +230,4 @@ JDK 17 + Android SDK, then `./gradlew assembleRelease`.
 Dictionaries: CC-CEDICT, JMdict/EDRDG, FreeDict — see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Optional online: MyMemory. Code licensed [GPL-3.0-or-later](LICENSE). Not affiliated with Google; Gboard is a trademark of Google LLC.
 
 ## Keywords
-Gboard, Gboard translation, Gboard 翻译, 谷歌输入法, 谷歌输入法翻译, LSPosed, LSPosed module, Xposed module, Xposed 模块, 输入法翻译, 候选词翻译, bilingual candidates, 双语候选词, 外语学习, language learning keyboard, vocabulary learning, domain glossary, 领域词表, Android, root, Magisk, Zygisk, offline dictionary, 离线词典, CC-CEDICT, JMdict, FreeDict, Qingjian, 青简, Material You, online translation, 在线翻译, Vector, modules.lsposed.org, io.github.ziyuw_plank.gboardgloss, SoftKeyView, concept diagram
+Gboard, Gboard translation, Gboard 翻译, 谷歌输入法, 谷歌输入法翻译, LSPosed, LSPosed module, Xposed module, Xposed 模块, 输入法翻译, 候选词翻译, bilingual candidates, 双语候选词, 外语学习, language learning keyboard, vocabulary learning, domain glossary, 领域词表, Android, root, Magisk, Zygisk, offline dictionary, 离线词典, CC-CEDICT, JMdict, FreeDict, jieba, Chinese word segmentation, 中文分词, phrase translation, 短语翻译, Qingjian, 青简, Material You, online translation, 在线翻译, Vector, modules.lsposed.org, io.github.ziyuw_plank.gboardgloss, SoftKeyView, concept diagram

@@ -1,0 +1,141 @@
+早餐	breakfast	common
+晚餐	dinner|supper|evening meal	common
+菜单	menu	common
+服务员	waiter|waitress|attendant	common
+厕所	toilet|restroom|bathroom|lavatory	common
+洗手间	restroom|toilet|bathroom|washroom|lavatory	common
+电梯	elevator|lift	common
+楼梯	stair	common
+门口	door|entrance|gate	common
+停车场	parking	common
+加油站	gas station|petrol station|filling station	common
+药店	pharmacy|drugstore|chemist	common
+邮局	post office	common
+快递员	courier|delivery	common
+同学	classmate	common
+室友	roommate	common
+宠物	pet	common
+小狗	puppy|dog	common
+蛋糕	cake	common
+饺子	dumpling	common
+西瓜	watermelon	common
+香蕉	banana	common
+葡萄	grape	common
+巧克力	chocolate	common
+冰淇淋	ice cream	common
+果汁	juice	common
+衬衫	shirt	common
+裤子	trousers|pants	common
+帽子	hat|cap	common
+手表	watch	common
+耳机	earphone|headphone|earbud	common
+充电器	charger	common
+相机	camera	common
+地图	map	common
+价格	price	common
+打折	discount	common
+免费	free	common
+发票	invoice|receipt	common
+退款	refund	common
+预约	appointment|reserv|book	common
+取消	cancel	common
+确认	confirm	common
+同时	at the same time|simultaneous|meanwhile	common
+突然间	suddenly|sudden	common
+终于	finally|at last	common
+其他	other	common
+任何	any	common
+比如	for example|such as|for instance	common
+例如	for example|such as|for instance	common
+另外	in addition|besides|other|another|additional	common
+总是	always	common
+从来	always|never|all along	common
+永远	forever|always	common
+不清楚的	unclear|not clear	neg
+不喜欢吃	not like|dislike	neg
+没见过	never seen|haven't seen|not seen|didn't see	neg
+没想过	never thought|haven't thought|didn't think	neg
+不想吃	don't want|not want	neg
+不敢	dare not|don't dare|not dare	neg
+不愿意	unwilling|not willing|don't want|not wish	neg
+别说了	stop talking|don't say|stop it	neg
+别动	don't move|freeze	neg
+不太好吃	not.*tasty|not.*good|not delicious	neg
+吃午饭	lunch	vo
+吃晚饭	dinner|supper|evening meal	vo
+喝茶	tea	vo
+看比赛	match|game|competition	vo
+听歌	song|music|listen	vo
+打游戏	game	vo
+买衣服	cloth	vo
+剪头发	haircut|cut.*hair|hair	vo
+寄快递	send|express|mail|package|courier	vo
+取钱	withdraw|money	vo
+存钱	save|deposit|money	vo
+写报告	report	vo
+发朋友圈	moments|post	vo
+看手机	phone	vo
+玩手机	phone	vo
+学做饭	cook|prepare a meal	vo
+打针	injection|shot|jab	vo
+请朋友吃饭	treat|dinner|meal|friend	vo
+我也不知道	don't know|not know	sentence
+你觉得怎么样	what do you think|how	sentence
+我们一起去吧	let's go together|let's go|together	sentence
+我今天很忙	busy	sentence
+他很生气	angry	sentence
+她不在家	not at home|not home	sentence
+你吃饭了吗	eaten|eat	sentence
+我想睡觉	sleep|bed	sentence
+我很高兴	happy|glad	sentence
+我想回家	home	sentence
+这是我的	mine|my	sentence
+你是谁	who are you	sentence
+这是什么	what is this|what's this|what this	sentence
+我没看懂	not understand|didn't understand|didn't get	sentence
+天气真好	weather|nice|good	sentence
+外面下雨了	rain	sentence
+我们明天见	tomorrow	sentence
+今天几号	date|what.*day|number	sentence
+别忘了带伞	umbrella|forget	sentence
+祝你生日快乐	happy birthday	sentence
+一石二鸟	two birds	idiom
+自由自在	free|carefree|unrestrained	idiom
+千真万确	absolutely true|absolutely|true	idiom
+争先恐后	vie|rush|scramble|striving to be first|eager|compete to be first	idiom
+有条不紊	orderly|methodical|systematic|regular and thorough	idiom
+半斤八两	six of one|same|equal|tweedledum|much the same	idiom
+不三不四	shady|dubious|neither|disreputable|nondescript	idiom
+无忧无虑	carefree|free from|without worry	idiom
+恍然大悟	sudden|realiz|enlighten|dawn	idiom
+津津乐道	relish|delight|enjoy|talk|discuss	idiom
+量子纠缠	quantum entanglement|entanglement	tech
+薛定谔方程	schr	tech
+测不准原理	uncertainty principle|uncertainty	tech
+相变	phase transition|phase change	tech
+超导体	superconductor	tech
+绝对零度	absolute zero	tech
+光电效应	photoelectric effect|photoelectric	tech
+多普勒效应	doppler	tech
+有机化学	organic chemistry	tech
+无机化学	inorganic chemistry	tech
+化学反应	chemical reaction	tech
+分子生物学	molecular biology	tech
+基因组	genome	tech
+干细胞	stem cell	tech
+新陈代谢	metabolism	tech
+操作系统内核	kernel|operating system	tech
+数据分析	data analysis|data analy	tech
+机器人	robot	tech
+无人机	drone|uav|unmanned	tech
+传感器	sensor	tech
+集成电路	integrated circuit	tech
+晶体管	transistor	tech
+二进制	binary	tech
+算力	computing power|computational power|compute	tech
+带宽	bandwidth	tech
+延迟	delay|latency|postpone	tech
+固态硬盘	solid state|ssd|solid-state	tech
+开发者	developer	tech
+用户体验	user experience	tech
+网络安全	cyber|network security|internet security	tech
