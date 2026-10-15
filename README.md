@@ -53,7 +53,9 @@
 ![Control center](docs/control-center.svg)
 
 ## 模块仓库（LSPosed / Vector）
-已向 [Xposed Module Repository](https://modules.lsposed.org) 提交收录（[submission #2167](https://github.com/Xposed-Modules-Repo/submission/issues/2167)）；**Vector** 与 LSPosed 共用该远程列表，无需单独上架。包名：`io.github.ziyuw_plank.gboardgloss`。
+已收录：[modules.lsposed.org 模块页](https://modules.lsposed.org/module/io.github.ziyuw_plank.gboardgloss)（[仓库](https://github.com/Xposed-Modules-Repo/io.github.ziyuw_plank.gboardgloss)，[submission #2167](https://github.com/Xposed-Modules-Repo/submission/issues/2167)）。**Vector** 与 LSPosed 共用该远程列表。包名：`io.github.ziyuw_plank.gboardgloss`。
+
+> 模块仓库的 **GitHub Description** 需在网页上手动设为 `GboardGloss`（API 无权限），否则可能不在列表显示。
 
 ## 安装与使用
 1. 从 [Releases](https://github.com/ziyuw-Plank/gboard-gloss/releases) 下载 `GboardGloss-0.3.2.apk` 并安装
@@ -171,7 +173,9 @@ GboardGloss shows a translation under each Gboard suggestion so you pick up voca
 ![Control center](docs/control-center.svg)
 
 ### Module repository (LSPosed / Vector)
-Submitted to the [Xposed Module Repository](https://modules.lsposed.org) ([submission #2167](https://github.com/Xposed-Modules-Repo/submission/issues/2167)). **Vector** and LSPosed share that remote list — no separate Vector store. Package: `io.github.ziyuw_plank.gboardgloss`.
+Listed: [modules.lsposed.org page](https://modules.lsposed.org/module/io.github.ziyuw_plank.gboardgloss) ([repo](https://github.com/Xposed-Modules-Repo/io.github.ziyuw_plank.gboardgloss), [submission #2167](https://github.com/Xposed-Modules-Repo/submission/issues/2167)). **Vector** and LSPosed share that list. Package: `io.github.ziyuw_plank.gboardgloss`.
+
+> Set the modules-repo GitHub **Description** to `GboardGloss` in the browser (API lacks permission) or it may stay hidden.
 
 ### Install & use
 1. Download `GboardGloss-0.3.2.apk` from [Releases](https://github.com/ziyuw-Plank/gboard-gloss/releases) and install it
