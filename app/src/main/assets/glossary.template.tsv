@@ -1,0 +1,8 @@
+# GboardGloss user glossary template
+# Format: key<TAB>gloss   (one entry per line, UTF-8)
+# Exact match only — used before the bundled dictionaries.
+# Import this file from the GboardGloss settings page.
+#
+# Examples (delete these lines and add your own):
+# 术语甲	term A
+# 术语乙	term B

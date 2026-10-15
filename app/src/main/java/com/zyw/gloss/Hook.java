@@ -8,6 +8,7 @@ import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.inputmethodservice.InputMethodService;
 import android.os.Handler;
@@ -39,8 +40,7 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 /**
  * Additive gloss on Gboard candidate SoftKeyViews.
- * Hot path (dispatchDraw): instanceof SoftKeyView + tagged gloss string + Paint.drawText only.
- * Parent walk / dict lookup only when SoftKeyDef is bound (SoftKeyView.r).
+ * Hot path: tagged gloss + soft secondary paint only.
  */
 public class Hook implements IXposedHookLoadPackage, IXposedHookZygoteInit {
   static final String GBOARD = "com.google.android.inputmethod.latin";
@@ -52,14 +52,16 @@ public class Hook implements IXposedHookLoadPackage, IXposedHookZygoteInit {
   static XSharedPreferences prefs;
   static ZipFile zip;
   static Class<?> softKeyCls;
-  static Field softKeyDefLabels; // SoftKeyDef.g CharSequence[]
+  static Field softKeyDefLabels;
   static final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
   static boolean paintInit, bannerShown, toastShown;
-  static int logBudget = 40; // hierarchy / bind logs (first N, always)
+  static int logBudget = 40;
   static long lastReload;
   static int lastSize = -1;
   static boolean lastNight;
+  static float lastDensity = -1;
   static final Set<Class<?>> hookedIme = new HashSet<>();
+  static String lastUserGlossary;
 
   static final Dictionary.Opener OPENER = Hook::openAsset;
 
@@ -87,9 +89,13 @@ public class Hook implements IXposedHookLoadPackage, IXposedHookZygoteInit {
     log("loaded in " + lp.processName + " module=" + modulePath);
     prefs = new XSharedPreferences(ME, Prefs.NAME);
     prefs.makeWorldReadable();
+    reloadGlossary();
     log("prefs readable=" + prefs.getFile().canRead()
         + " enabled=" + prefs.getBoolean(Prefs.ENABLED, true)
-        + " lang=" + prefs.getString(Prefs.LANG, "en"));
+        + " lang=" + prefs.getString(Prefs.LANG, "en")
+        + " online=" + prefs.getBoolean(Prefs.ONLINE, false)
+        + " glossary builtin=" + Dictionary.glossaryBuiltinCount()
+        + " user=" + Dictionary.glossaryUserCount());
 
     try {
       softKeyCls = XposedHelpers.findClass(SOFTKEY, lp.classLoader);
@@ -106,12 +112,9 @@ public class Hook implements IXposedHookLoadPackage, IXposedHookZygoteInit {
       log("SoftKeyDef.g field: " + t);
     }
 
-    // Prefetch zh_en so first keystroke is cheap; also verifies aapt .tsv vs .tsv.gz path.
     try {
       int n = Dictionary.size(OPENER, "zh", "en");
-      log("dict zh_en size=" + n + " via=" + Dictionary.loadedVia(OPENER, "zh", "en")
-          + " sample这=" + Dictionary.translate(OPENER, "这", "en")
-          + " sample这是=" + Dictionary.translate(OPENER, "这是", "en"));
+      log("dict zh_en size=" + n + " via=" + Dictionary.loadedVia(OPENER, "zh", "en"));
     } catch (Throwable t) { log("dict prefetch " + t); }
 
     try {
@@ -143,7 +146,6 @@ public class Hook implements IXposedHookLoadPackage, IXposedHookZygoteInit {
       log("hook installed: InputMethodService.onCreate");
     } catch (Throwable t) { log("hook fail IMS.onCreate " + t); }
 
-    // Bind path: SoftKeyView.r(SoftKeyDef, long) — dict + tags only when label changes.
     if (softKeyCls != null) {
       try {
         XposedHelpers.findAndHookMethod(softKeyCls, "r",
@@ -160,8 +162,6 @@ public class Hook implements IXposedHookLoadPackage, IXposedHookZygoteInit {
       } catch (Throwable t) { log("hook fail SoftKeyView.r " + t); }
     }
 
-    // Draw path: ViewGroup.dispatchDraw, but exit in one instanceof check for non-SoftKeyView.
-    // SoftKeyView does not override dispatchDraw; hooking ViewGroup is required.
     try {
       XposedHelpers.findAndHookMethod(ViewGroup.class, "dispatchDraw", Canvas.class, new XC_MethodHook() {
         @Override protected void afterHookedMethod(MethodHookParam p) {
@@ -175,6 +175,20 @@ public class Hook implements IXposedHookLoadPackage, IXposedHookZygoteInit {
       });
       log("hook installed: ViewGroup.dispatchDraw (SoftKeyView-filtered)");
     } catch (Throwable t) { log("hook fail dispatchDraw " + t); }
+  }
+
+  static void reloadGlossary() {
+    String user = prefs != null ? prefs.getString(Prefs.USER_GLOSSARY, "") : "";
+    if (user == null) user = "";
+    if (glossaryLoadedSame(user)) return;
+    lastUserGlossary = user;
+    Dictionary.clearTransCache();
+    Dictionary.loadGlossary(OPENER, user);
+  }
+
+  static boolean glossaryLoadedSame(String user) {
+    return lastUserGlossary != null && lastUserGlossary.equals(user)
+        && Dictionary.glossaryBuiltinCount() > 0;
   }
 
   static void hookImeClass(Class<?> c) {
@@ -210,21 +224,22 @@ public class Hook implements IXposedHookLoadPackage, IXposedHookZygoteInit {
           boolean night = (decor.getResources().getConfiguration().uiMode
               & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
           {
-            bg.setColor(night ? 0xF03C4043 : 0xF0E8F0FE);
+            bg.setColor(night ? 0xE03C4043 : 0xE0E8F0FE);
             tx.setColor(night ? 0xFFE8EAED : 0xFF174EA6);
             tx.setTextSize(13 * d);
             tx.setTextAlign(Paint.Align.CENTER);
+            tx.setLetterSpacing(0.02f);
           }
           @Override public void draw(Canvas c) {
             Rect b = getBounds();
-            String s = "✓ GboardGloss 已注入 · 目标 " + prefs.getString(Prefs.LANG, "en");
+            String s = "✓ GboardGloss · " + prefs.getString(Prefs.LANG, "en");
             float w = tx.measureText(s) + 28 * d, h = 28 * d;
             float cx = b.width() / 2f, y = b.height() - h - 4 * d;
             c.drawRoundRect(cx - w / 2, y, cx + w / 2, y + h, h / 2, h / 2, bg);
             c.drawText(s, cx, y + h / 2 - (tx.ascent() + tx.descent()) / 2, tx);
           }
           @Override public void setAlpha(int x) {
-            a = x; bg.setAlpha(x * 240 / 255); tx.setAlpha(x); invalidateSelf();
+            a = x; bg.setAlpha(x * 224 / 255); tx.setAlpha(x); invalidateSelf();
           }
           @Override public void setColorFilter(ColorFilter f) {}
           @Override public int getOpacity() { return PixelFormat.TRANSLUCENT; }
@@ -248,7 +263,6 @@ public class Hook implements IXposedHookLoadPackage, IXposedHookZygoteInit {
     });
   }
 
-  /** One-time (cached) hierarchy check — loosened for *Candidates*Holder* / Suggestion strip. */
   static boolean resolveIsCandidate(View v) {
     Object cached = v.getTag(R.id.gloss_is_candidate);
     if (cached instanceof Boolean) return (Boolean) cached;
@@ -262,13 +276,11 @@ public class Hook implements IXposedHookLoadPackage, IXposedHookZygoteInit {
         hier.append(k.getSimpleName());
       }
       if (n.startsWith("android.") || n.startsWith("androidx.")) {
-        // keep walking a bit for androidx RecyclerView wrappers
         if (n.contains("RecyclerView") || n.contains("ViewPager")) continue;
         break;
       }
       String simple = k.getSimpleName();
       if (containsCand(n) || containsCand(simple)) { yes = true; break; }
-      // Soft keyboard host — not a candidate strip
       if (n.contains("SoftKeyboardView") && !containsCand(n)) { yes = false; break; }
     }
     v.setTag(R.id.gloss_is_candidate, yes);
@@ -324,13 +336,13 @@ public class Hook implements IXposedHookLoadPackage, IXposedHookZygoteInit {
     if (now - lastReload > 2000) {
       lastReload = now;
       prefs.reload();
+      reloadGlossary();
     }
     if (!prefs.getBoolean(Prefs.ENABLED, true)) {
       clearGloss(v);
       return;
     }
     if (!resolveIsCandidate(v)) {
-      // Keep FALSE tag; ensure no stale gloss on keyboard keys.
       if (v.getTag(R.id.gloss_text) != null) clearGloss(v);
       return;
     }
@@ -339,20 +351,43 @@ public class Hook implements IXposedHookLoadPackage, IXposedHookZygoteInit {
       clearGloss(v);
       return;
     }
-    // Skip non-word chrome (single letter keys rarely appear in candidate strip; still ok)
     Object prev = v.getTag(R.id.gloss_word);
-    if (word.equals(prev)) return; // label unchanged — no dict work
+    if (word.equals(prev)) return;
 
     v.setTag(R.id.gloss_word, word);
     String lang = prefs.getString(Prefs.LANG, "en");
     String gloss = Dictionary.translate(OPENER, word, lang);
-    if (gloss != null && gloss.length() > 16) gloss = gloss.substring(0, 15) + "…";
-    v.setTag(R.id.gloss_text, gloss); // null = no translation
+    gloss = Dictionary.fitGlossToken(gloss, 22);
+    v.setTag(R.id.gloss_text, gloss);
+
+    if (gloss == null && prefs.getBoolean(Prefs.ONLINE, false)) {
+      String src = Dictionary.detectPrimary(word);
+      if (src != null && !src.equals(lang)) {
+        String peek = OnlineTranslate.peek(word, lang);
+        if (peek != null) {
+          if (!peek.isEmpty()) {
+            v.setTag(R.id.gloss_text, Dictionary.fitGlossToken(peek, 22));
+          }
+        } else {
+          final String expect = word;
+          OnlineTranslate.request(word, src, lang, (w, g) -> {
+            try {
+              if (!expect.equals(v.getTag(R.id.gloss_word))) return;
+              if (g != null && !g.isEmpty()) {
+                v.setTag(R.id.gloss_text, Dictionary.fitGlossToken(g, 22));
+                v.invalidate();
+              }
+            } catch (Throwable t) { log("online cb " + t); }
+          });
+        }
+      }
+    }
+
     if (logBudget > 0 || prefs.getBoolean(Prefs.DEBUG, false)) {
       if (logBudget > 0) logBudget--;
-      log("bind '" + word + "' → " + gloss);
+      log("bind '" + word + "' → " + v.getTag(R.id.gloss_text));
     }
-    v.invalidate(); // only this SoftKeyView
+    v.invalidate();
   }
 
   static void clearGloss(View v) {
@@ -363,30 +398,95 @@ public class Hook implements IXposedHookLoadPackage, IXposedHookZygoteInit {
     }
   }
 
-  /** Hot path: no parent walk, no dict, no string alloc beyond drawText. */
+  /** Soft secondary label: ~60% alpha, theme grey, slight tracking, 1 line. */
   static void drawCachedGloss(View v, Canvas c) {
     Object g = v.getTag(R.id.gloss_text);
     if (!(g instanceof String)) return;
     String gloss = (String) g;
     if (gloss.isEmpty()) return;
 
+    float d = v.getResources().getDisplayMetrics().density;
     float sd = v.getResources().getDisplayMetrics().scaledDensity;
-    int size = prefs.getInt(Prefs.SIZE, 11);
+    int h = v.getHeight();
+    // Too short to fit a secondary line without crowding the candidate glyph
+    if (h < 22 * d) return;
+
+    int size = prefs.getInt(Prefs.SIZE, 10);
     if (size < 8) size = 8;
+    if (size > 14) size = 14;
+    // Secondary label slightly smaller than the slider suggests
+    float textPx = size * sd * 0.92f;
+    // Shrink further on short keys
+    if (h < 32 * d) textPx = Math.min(textPx, 9f * sd);
+
     boolean night = (v.getResources().getConfiguration().uiMode
         & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
-    if (!paintInit || size != lastSize || night != lastNight) {
+    if (!paintInit || size != lastSize || night != lastNight || d != lastDensity) {
       paintInit = true;
       lastSize = size;
       lastNight = night;
+      lastDensity = d;
       paint.setTextAlign(Paint.Align.CENTER);
-      paint.setTextSize(size * sd);
-      // High-contrast: amber on dark, Google Blue on light — never match key glyph color.
-      paint.setColor(night ? 0xFFFFC107 : 0xFF1A73E8);
+      paint.setTypeface(Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL));
+      paint.setLetterSpacing(0.04f);
+      paint.setFakeBoldText(false);
+      // Soft secondary (~60%): follow Gboard-like on-surface variant, not loud amber
+      paint.setColor(night ? 0x99E8EAED : 0x99607078);
     }
+    paint.setTextSize(textPx);
+
+    float maxW = Math.max(8f, v.getWidth() - 6f * d);
+    String draw = gloss;
+    if (paint.measureText(draw) > maxW) {
+      draw = fitToWidth(draw, paint, maxW);
+      if (draw == null || draw.isEmpty()) return;
+    }
+
     float x = v.getWidth() / 2f;
-    float y = v.getHeight() - paint.descent() - 2f * sd;
-    if (y < -paint.ascent()) y = v.getHeight() / 2f - (paint.ascent() + paint.descent()) / 2f;
-    c.drawText(gloss, x, y, paint);
+    float y = h - paint.descent() - 1.5f * d;
+    // Keep above bottom padding; if it would sit on the glyph midline, skip
+    float top = y + paint.ascent();
+    if (top < h * 0.42f) {
+      // Try one size smaller
+      paint.setTextSize(textPx * 0.85f);
+      y = h - paint.descent() - 1.2f * d;
+      top = y + paint.ascent();
+      if (top < h * 0.38f) return;
+    }
+    c.drawText(draw, x, y, paint);
+  }
+
+  /** Ellipsis only after a complete token; otherwise drop the gloss. */
+  static String fitToWidth(String g, Paint p, float maxW) {
+    if (p.measureText(g) <= maxW) return g;
+    String[] parts = g.split(" (?=\\S)|(?<=·) ");
+    if (parts.length == 1) {
+      // Single token too long: shrink not mid-ellipsis
+      float lo = p.getTextSize() * 0.7f, hi = p.getTextSize();
+      float saved = p.getTextSize();
+      for (int i = 0; i < 6; i++) {
+        float mid = (lo + hi) / 2f;
+        p.setTextSize(mid);
+        if (p.measureText(g) <= maxW) lo = mid; else hi = mid;
+      }
+      p.setTextSize(lo);
+      if (p.measureText(g) <= maxW) return g;
+      p.setTextSize(saved);
+      return null;
+    }
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < parts.length; i++) {
+      String trial = i == 0 ? parts[0] : sb + " " + parts[i];
+      String withEll = trial + "…";
+      if (p.measureText(withEll) > maxW) {
+        String base = sb.toString().trim();
+        if (base.isEmpty()) return null;
+        if (base.endsWith("·")) base = base.substring(0, base.length() - 1).trim();
+        return base + "…";
+      }
+      if (i == 0) sb.append(parts[0]);
+      else sb.append(' ').append(parts[i]);
+    }
+    return sb.toString();
   }
 }
