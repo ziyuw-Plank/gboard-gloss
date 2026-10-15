@@ -50,14 +50,16 @@ public class Hook implements IXposedHookLoadPackage, IXposedHookZygoteInit {
       final float d = decor.getResources().getDisplayMetrics().density;
       Drawable dr = new Drawable() {
         final Paint bg = new Paint(Paint.ANTI_ALIAS_FLAG), tx = new Paint(Paint.ANTI_ALIAS_FLAG);
-        { bg.setColor(0xE0386A20); tx.setColor(Color.WHITE); tx.setTextSize(13 * d); tx.setTextAlign(Paint.Align.CENTER); }
-        @Override public void draw(Canvas c) { Rect b = getBounds(); String s = "GboardGloss 已注入 ✓  目标: " + prefs.getString(Prefs.LANG, "en");
-          float w = tx.measureText(s) + 24 * d, h = 26 * d, cx = b.width() / 2f, y = b.height() - h - 4 * d;
+        int a = 255; boolean night = (decor.getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+        { bg.setColor(night ? 0xF03C4043 : 0xF0E8F0FE); tx.setColor(night ? 0xFFE8EAED : 0xFF174EA6); tx.setTextSize(13 * d); tx.setTextAlign(Paint.Align.CENTER); }
+        @Override public void draw(Canvas c) { Rect b = getBounds(); String s = "✓ GboardGloss 已注入 · 目标 " + prefs.getString(Prefs.LANG, "en");
+          float w = tx.measureText(s) + 28 * d, h = 28 * d, cx = b.width() / 2f, y = b.height() - h - 4 * d;
           c.drawRoundRect(cx - w / 2, y, cx + w / 2, y + h, h / 2, h / 2, bg); c.drawText(s, cx, y + h / 2 - (tx.ascent() + tx.descent()) / 2, tx); }
-        @Override public void setAlpha(int a) {} @Override public void setColorFilter(ColorFilter f) {} @Override public int getOpacity() { return PixelFormat.TRANSLUCENT; } };
+        @Override public void setAlpha(int x) { a = x; bg.setAlpha(x * 240 / 255); tx.setAlpha(x); invalidateSelf(); } @Override public void setColorFilter(ColorFilter f) {} @Override public int getOpacity() { return PixelFormat.TRANSLUCENT; } };
       dr.setBounds(0, 0, decor.getWidth(), decor.getHeight()); decor.getOverlay().add(dr); decor.invalidate();
       log("banner shown on " + decor.getClass().getName() + " " + decor.getWidth() + "x" + decor.getHeight());
-      decor.postDelayed(() -> { try { decor.getOverlay().remove(dr); } catch (Throwable ignored) {} }, 6000);
+      android.animation.ObjectAnimator an = android.animation.ObjectAnimator.ofInt(dr, "alpha", 255, 0); an.setStartDelay(4500); an.setDuration(700);
+      an.addUpdateListener(x -> decor.invalidate()); an.addListener(new android.animation.AnimatorListenerAdapter() { @Override public void onAnimationEnd(android.animation.Animator x) { try { decor.getOverlay().remove(dr); } catch (Throwable ignored) {} } }); an.start();
     } catch (Throwable t) { log("banner err " + t); } });
   }
   static boolean underCandidateHolder(View v) {
