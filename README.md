@@ -37,7 +37,6 @@
 - Root（Magisk）+ LSPosed（Zygisk）
 - Gboard（对照分析版本 18.4.1）
 
-
 ## 概念图
 | 图 | 说明 |
 |---|---|
@@ -54,8 +53,6 @@
 
 ## 模块仓库（LSPosed / Vector）
 已收录：[modules.lsposed.org 模块页](https://modules.lsposed.org/module/io.github.ziyuw_plank.gboardgloss)（[仓库](https://github.com/Xposed-Modules-Repo/io.github.ziyuw_plank.gboardgloss)，[submission #2167](https://github.com/Xposed-Modules-Repo/submission/issues/2167)）。**Vector** 与 LSPosed 共用该远程列表。包名：`io.github.ziyuw_plank.gboardgloss`。
-
-> 模块仓库的 **GitHub Description** 需在网页上手动设为 `GboardGloss`（API 无权限），否则可能不在列表显示。
 
 ## 安装与使用
 1. 从 [Releases](https://github.com/ziyuw-Plank/gboard-gloss/releases) 下载最新的 `GboardGloss-*.apk` 并安装
@@ -156,7 +153,6 @@ Stitching dictionary words together gives a pile of words, not a sentence: no gr
 - Root (Magisk) + LSPosed (Zygisk)
 - Gboard (analyzed against 18.4.1)
 
-
 ### Concept diagrams
 | Diagram | What it shows |
 |---|---|
@@ -173,8 +169,6 @@ Stitching dictionary words together gives a pile of words, not a sentence: no gr
 
 ### Module repository (LSPosed / Vector)
 Listed: [modules.lsposed.org page](https://modules.lsposed.org/module/io.github.ziyuw_plank.gboardgloss) ([repo](https://github.com/Xposed-Modules-Repo/io.github.ziyuw_plank.gboardgloss), [submission #2167](https://github.com/Xposed-Modules-Repo/submission/issues/2167)). **Vector** and LSPosed share that list. Package: `io.github.ziyuw_plank.gboardgloss`.
-
-> Set the modules-repo GitHub **Description** to `GboardGloss` in the browser (API lacks permission) or it may stay hidden.
 
 ### Install & use
 1. Download the latest `GboardGloss-*.apk` from [Releases](https://github.com/ziyuw-Plank/gboard-gloss/releases) and install it
