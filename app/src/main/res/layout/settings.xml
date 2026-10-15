@@ -1,13 +1,15 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
-  android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="20dp">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent"><LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="20dp">
   <TextView android:text="Gboard 译词控制中心" android:textAppearance="?attr/textAppearanceHeadlineSmall" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="16dp"/>
   <TextView android:id="@+id/status" android:textAppearance="?attr/textAppearanceBodyMedium" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="12dp"/>
   <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" app:contentPadding="16dp" android:layout_marginBottom="12dp">
-    <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/enable" android:text="启用译词显示" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content"><com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/enable" android:text="启用译词显示" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/banner" android:text="显示注入提示（键盘底部）" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/debug" android:text="调试模式（在 LSPosed 日志记录候选词）" android:layout_width="match_parent" android:layout_height="wrap_content"/></LinearLayout>
   </com.google.android.material.card.MaterialCardView>
   <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" app:contentPadding="16dp" android:layout_marginBottom="12dp">
     <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
-      <TextView android:text="目标语言" android:textAppearance="?attr/textAppearanceTitleMedium" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+      <TextView android:text="目标语言（源语言自动识别）" android:textAppearance="?attr/textAppearanceTitleMedium" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
       <com.google.android.material.chip.ChipGroup android:id="@+id/langs" app:singleSelection="true" app:selectionRequired="true" android:layout_width="match_parent" android:layout_height="wrap_content"/>
     </LinearLayout>
   </com.google.android.material.card.MaterialCardView>
@@ -18,4 +20,4 @@
       <TextView android:id="@+id/dict" android:textAppearance="?attr/textAppearanceBodySmall" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
     </LinearLayout>
   </com.google.android.material.card.MaterialCardView>
-</LinearLayout>
+</LinearLayout></ScrollView>
