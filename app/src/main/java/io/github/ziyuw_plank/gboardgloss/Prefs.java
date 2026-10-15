@@ -1,4 +1,4 @@
-package io.github.ziyuwplank.gboardgloss;
+package io.github.ziyuw_plank.gboardgloss;
 public final class Prefs {
   public static final String NAME = "gloss";
   public static final String ENABLED = "enabled";

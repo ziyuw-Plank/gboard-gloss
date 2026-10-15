@@ -1,4 +1,4 @@
-package io.github.ziyuwplank.gboardgloss;
+package io.github.ziyuw_plank.gboardgloss;
 
 import android.app.Activity;
 import android.content.Intent;

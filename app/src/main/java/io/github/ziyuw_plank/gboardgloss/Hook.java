@@ -1,4 +1,4 @@
-package io.github.ziyuwplank.gboardgloss;
+package io.github.ziyuw_plank.gboardgloss;
 
 import android.app.Application;
 import android.content.Context;
@@ -44,7 +44,7 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
  */
 public class Hook implements IXposedHookLoadPackage, IXposedHookZygoteInit {
   static final String GBOARD = "com.google.android.inputmethod.latin";
-  static final String ME = "io.github.ziyuwplank.gboardgloss";
+  static final String ME = "io.github.ziyuw_plank.gboardgloss";
   static final String SOFTKEY = "com.google.android.libraries.inputmethod.widgets.SoftKeyView";
   static final String SOFTKEY_DEF = "com.google.android.libraries.inputmethod.metadata.SoftKeyDef";
 
