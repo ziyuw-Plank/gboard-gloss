@@ -53,6 +53,7 @@ public class Hook implements IXposedHookLoadPackage, IXposedHookZygoteInit {
   static ZipFile zip;
   static Class<?> softKeyCls;
   static Field softKeyDefLabels;
+  static Field softKeyDefField;
   static final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
   static boolean paintInit, bannerShown, toastShown;
   static int logBudget = 40;
@@ -107,10 +108,15 @@ public class Hook implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 
     try {
       Class<?> defCls = XposedHelpers.findClass(SOFTKEY_DEF, lp.classLoader);
-      softKeyDefLabels = defCls.getField("g");
-      softKeyDefLabels.setAccessible(true);
+      softKeyDefLabels = findLabelField(defCls);
+      if (softKeyDefLabels != null) {
+        log("SoftKeyDef labels field=" + softKeyDefLabels.getName()
+            + " type=" + softKeyDefLabels.getType().getName());
+      } else {
+        log("SoftKeyDef labels field NOT found; TextView fallback only");
+      }
     } catch (Throwable t) {
-      log("SoftKeyDef.g field: " + t);
+      log("SoftKeyDef labels: " + t);
     }
 
     try {
@@ -148,19 +154,12 @@ public class Hook implements IXposedHookLoadPackage, IXposedHookZygoteInit {
     } catch (Throwable t) { log("hook fail IMS.onCreate " + t); }
 
     if (softKeyCls != null) {
-      try {
-        XposedHelpers.findAndHookMethod(softKeyCls, "r",
-            XposedHelpers.findClass(SOFTKEY_DEF, lp.classLoader), long.class,
-            new XC_MethodHook() {
-              @Override protected void afterHookedMethod(MethodHookParam p) {
-                try { onSoftKeyBound((View) p.thisObject, p.args[0]); }
-                catch (Throwable t) {
-                  if (logBudget > 0) { logBudget--; log("bind err " + t); }
-                }
-              }
-            });
-        log("hook installed: SoftKeyView.r");
-      } catch (Throwable t) { log("hook fail SoftKeyView.r " + t); }
+      softKeyDefField = findSoftKeyDefField(softKeyCls);
+      if (softKeyDefField != null) {
+        log("SoftKeyView SoftKeyDef field=" + softKeyDefField.getName());
+      }
+      int n = hookSoftKeyBindMethods(softKeyCls, lp.classLoader);
+      log("SoftKeyView bind hooks installed=" + n);
     }
 
     try {
@@ -168,8 +167,17 @@ public class Hook implements IXposedHookLoadPackage, IXposedHookZygoteInit {
         @Override protected void afterHookedMethod(MethodHookParam p) {
           Object self = p.thisObject;
           if (softKeyCls == null || !softKeyCls.isInstance(self)) return;
-          try { drawCachedGloss((View) self, (Canvas) p.args[0]); }
-          catch (Throwable t) {
+          try {
+            View v = (View) self;
+            // Fallback if bind hook missed this SoftKeyView (obfuscation rename / early draw)
+            if (v.getTag(R.id.gloss_word) == null && softKeyDefField != null) {
+              try {
+                Object def = softKeyDefField.get(v);
+                if (def != null) onSoftKeyBound(v, def);
+              } catch (Throwable ignored) {}
+            }
+            drawCachedGloss(v, (Canvas) p.args[0]);
+          } catch (Throwable t) {
             if (logBudget > 0) { logBudget--; log("draw err " + t); }
           }
         }
@@ -310,18 +318,110 @@ public class Hook implements IXposedHookLoadPackage, IXposedHookZygoteInit {
         || n.contains("CandidatesHolder") || n.contains("candidate");
   }
 
-  static String extractLabel(View softKey, Object softKeyDef) {
-    try {
-      if (softKeyDef != null && softKeyDefLabels != null) {
-        Object arr = softKeyDefLabels.get(softKeyDef);
-        if (arr instanceof CharSequence[]) {
-          CharSequence[] cs = (CharSequence[]) arr;
-          if (cs.length > 0 && cs[0] != null) {
-            String s = cs[0].toString().trim();
-            if (!s.isEmpty()) return s;
-          }
+
+  /** Prefer CharSequence[] (pre-18.5 field g); else immutable list field (18.5+ field i). */
+  static Field findLabelField(Class<?> defCls) {
+    Field listField = null;
+    for (Field f : defCls.getDeclaredFields()) {
+      Class<?> t = f.getType();
+      if (t == CharSequence[].class || t == String[].class) {
+        f.setAccessible(true);
+        return f;
+      }
+      // Guava/ImmutableList-style containers used by Gboard 18.5+ (defpackage.wns)
+      if (!t.isPrimitive() && !t.getName().startsWith("java.lang.")
+          && !t.getName().startsWith("android.")
+          && !t.isArray()
+          && (t.getName().contains("wns") || hasGet0(t))) {
+        if (listField == null && !f.getName().equals("h") && !f.getName().equals("k")) {
+          // SoftKeyDef: h=actionDefs, i=labels, k=icons — prefer name i when present
+          listField = f;
+        }
+        if (f.getName().equals("i")) {
+          f.setAccessible(true);
+          return f;
         }
       }
+    }
+    if (listField != null) {
+      listField.setAccessible(true);
+      return listField;
+    }
+    return null;
+  }
+
+  static boolean hasGet0(Class<?> t) {
+    try {
+      Method m = t.getMethod("get", int.class);
+      Class<?> r = m.getReturnType();
+      return r == Object.class || CharSequence.class.isAssignableFrom(r) || r == String.class;
+    } catch (Throwable ignored) {
+      return false;
+    }
+  }
+
+  static Field findSoftKeyDefField(Class<?> softKey) {
+    for (Field f : softKey.getDeclaredFields()) {
+      if (SOFTKEY_DEF.equals(f.getType().getName())) {
+        f.setAccessible(true);
+        return f;
+      }
+    }
+    return null;
+  }
+
+  /** Hook setSoftKeyDef regardless of ProGuard name (r on 18.4, s on 18.5, plus c(SoftKeyDef)). */
+  static int hookSoftKeyBindMethods(Class<?> softKeyCls, ClassLoader cl) {
+    Class<?> defCls;
+    try { defCls = XposedHelpers.findClass(SOFTKEY_DEF, cl); }
+    catch (Throwable t) { log("SoftKeyDef missing " + t); return 0; }
+    XC_MethodHook h = new XC_MethodHook() {
+      @Override protected void afterHookedMethod(MethodHookParam p) {
+        try {
+          Object def = null;
+          if (p.args != null) {
+            for (Object a : p.args) {
+              if (a != null && defCls.isInstance(a)) { def = a; break; }
+            }
+          }
+          onSoftKeyBound((View) p.thisObject, def);
+        } catch (Throwable t) {
+          if (logBudget > 0) { logBudget--; log("bind err " + t); }
+        }
+      }
+    };
+    int n = 0;
+    for (Method m : softKeyCls.getDeclaredMethods()) {
+      Class<?>[] pt = m.getParameterTypes();
+      if (pt.length == 0 || pt.length > 2) continue;
+      if (!defCls.isAssignableFrom(pt[0])) continue;
+      if (pt.length == 2 && pt[1] != long.class && pt[1] != Long.class) continue;
+      // skip static helpers like SoftKeyView.r(SoftKeyDef) boolean predicate on 18.5
+      if ((m.getModifiers() & java.lang.reflect.Modifier.STATIC) != 0) continue;
+      try {
+        XposedBridge.hookMethod(m, h);
+        n++;
+        log("hook installed: SoftKeyView." + m.getName() + arity(pt));
+      } catch (Throwable t) {
+        log("hook fail SoftKeyView." + m.getName() + " " + t);
+      }
+    }
+    return n;
+  }
+
+  static String arity(Class<?>[] pt) {
+    StringBuilder sb = new StringBuilder("(");
+    for (int i = 0; i < pt.length; i++) {
+      if (i > 0) sb.append(',');
+      sb.append(pt[i].getSimpleName());
+    }
+    return sb.append(')').toString();
+  }
+
+  static String extractLabel(View softKey, Object softKeyDef) {
+    try {
+      String fromDef = labelFromDef(softKeyDef);
+      if (fromDef != null && !fromDef.isEmpty()) return fromDef;
     } catch (Throwable ignored) {}
     if (softKey instanceof ViewGroup) {
       StringBuilder sb = new StringBuilder();
@@ -330,6 +430,35 @@ public class Hook implements IXposedHookLoadPackage, IXposedHookZygoteInit {
     }
     CharSequence cd = softKey.getContentDescription();
     return cd == null ? "" : cd.toString().trim();
+  }
+
+  static String labelFromDef(Object softKeyDef) throws Exception {
+    if (softKeyDef == null || softKeyDefLabels == null) return null;
+    Object labels = softKeyDefLabels.get(softKeyDef);
+    if (labels == null) return null;
+    if (labels instanceof CharSequence[]) {
+      CharSequence[] cs = (CharSequence[]) labels;
+      if (cs.length > 0 && cs[0] != null) {
+        String s = cs[0].toString().trim();
+        return s.isEmpty() ? null : s;
+      }
+      return null;
+    }
+    // 18.5+: wns / ImmutableList of CharSequence (SoftKeyDef.i)
+    try {
+      Method isEmpty = labels.getClass().getMethod("isEmpty");
+      Object empty = isEmpty.invoke(labels);
+      if (empty instanceof Boolean && (Boolean) empty) return null;
+    } catch (Throwable ignored) {}
+    try {
+      Method get = labels.getClass().getMethod("get", int.class);
+      Object first = get.invoke(labels, 0);
+      if (first != null) {
+        String s = first.toString().trim();
+        return s.isEmpty() ? null : s;
+      }
+    } catch (Throwable ignored) {}
+    return null;
   }
 
   static void collectText(View v, StringBuilder sb) {
